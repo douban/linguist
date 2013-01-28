@@ -1,0 +1,98 @@
+# Vendored files and directories are excluded from language
+# statistics.
+#
+# Lines in this file are Regexps that are matched against the file
+# pathname.
+#
+# Please add additional test coverage to
+# `test/test_blob.rb#test_vendored` if you make any changes.
+
+## Vendor Conventions ##
+
+# Caches
+- cache/
+
+# C deps
+#  https://github.com/joyent/node
+- ^deps/
+- ^tools/
+
+# Node depedencies
+- node_modules/
+
+# Vendored depedencies
+- vendor/
+
+# Debian packaging
+- ^debian/
+
+## Commonly Bundled JavaScript frameworks ##
+
+# jQuery
+- (^|/)jquery([^.]*)(\.min)?\.js$
+- (^|/)jquery\-\d\.\d(\.\d)?(\.min)?\.js$
+
+# Prototype
+- (^|/)prototype(.*)\.js$
+- (^|/)effects\.js$
+- (^|/)controls\.js$
+- (^|/)dragdrop\.js$
+
+# MooTools
+- (^|/)mootools([^.]*)\d+\.\d+.\d+([^.]*)\.js$
+
+# Dojo
+- (^|/)dojo\.js$
+
+# MochiKit
+- (^|/)MochiKit\.js$
+
+# YUI
+- (^|/)yahoo-([^.]*)\.js$
+- (^|/)yui([^.]*)\.js$
+
+# LESS css
+- (^|/)less([^.]*)(\.min)?\.js$
+- (^|/)less\-\d+\.\d+\.\d+(\.min)?\.js$
+
+# WYS editors
+- (^|/)ckeditor\.js$
+- (^|/)tiny_mce([^.]*)\.js$
+- (^|/)tiny_mce/(langs|plugins|themes|utils)
+
+# MathJax
+- (^|/)MathJax/
+
+## Python ##
+
+# Fabric
+- ^fabfile\.py$
+
+# WAF
+- ^waf$
+
+
+## Obj-C ##
+
+# Sparkle
+- (^|/)Sparkle/
+
+## .NET ##
+
+# Visual Studio IntelliSense
+- -vsdoc\.js$
+
+# jQuery validation plugin (MS bundles this with asp.net mvc)
+- (^|/)jquery([^.]*)\.validate(\.min)?\.js$
+
+# Microsoft Ajax
+- (^|/)[Mm]icrosoft([Mm]vc)?([Aa]jax|[Vv]alidation)(\.debug)?\.js$
+
+# NuGet
+- ^[Pp]ackages/
+
+# ExtJS
+- (^|/)extjs/
+
+# Samples folders
+- ^[Ss]amples/
