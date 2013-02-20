@@ -224,6 +224,7 @@ CoffeeScript:
   primary_extension: .coffee
   extensions:
   - ._coffee
+  - .cson
   filenames:
   - Cakefile
 
@@ -246,6 +247,7 @@ Common Lisp:
   - lisp
   primary_extension: .lisp
   extensions:
+  - .asd
   - .lsp
   - .ny
 
@@ -429,6 +431,7 @@ Forth:
   color: "#341708"
   lexer: Text only
   extensions:
+  - .4th
   - .forth
   - .fth
 
@@ -746,6 +749,9 @@ Max:
   - maxmsp
   search_term: max/msp
   primary_extension: .mxt
+  extensions:
+  - .maxhelp
+  - .maxpat
 
 MiniD: # Legacy
   searchable: false
@@ -761,6 +767,11 @@ Mirah:
   - .duby
   - .mir
   - .mirah
+
+Monkey:
+  type: programming
+  lexer: Monkey
+  primary_extension: .monkey
 
 Moocode:
   lexer: MOOCode
@@ -1097,6 +1108,9 @@ Shell:
   - bash
   - zsh
   primary_extension: .sh
+  extensions:
+  - .bash
+  - .tmux
 
 Smalltalk:
   type: programming
@@ -1118,6 +1132,8 @@ SuperCollider:
   color: "#46390b"
   lexer: Text only
   primary_extension: .sc
+  extensions:
+  - .scd
 
 Tcl:
   type: programming
@@ -1188,6 +1204,10 @@ Verilog:
   lexer: verilog
   color: "#848bf3"
   primary_extension: .v
+  extensions:
+  - .sv
+  - .svh
+  - .vh
 
 VimL:
   type: programming
@@ -1222,6 +1242,9 @@ XML:
   primary_extension: .xml
   extensions:
   - .ccxml
+  - .dita
+  - .ditamap
+  - .ditaval
   - .glade
   - .grxml
   - .kml
@@ -1231,6 +1254,11 @@ XML:
   - .rss
   - .scxml
   - .svg
+  - .tmCommand
+  - .tmLanguage
+  - .tmPreferences
+  - .tmSnippet
+  - .tml
   - .vxml
   - .wsdl
   - .wxi
@@ -1277,6 +1305,12 @@ eC:
   primary_extension: .ec
   extensions:
   - .eh
+
+fish:
+  type: programming
+  group: Shell
+  lexer: Text only
+  primary_extension: .fish
 
 mupad:
   lexer: MuPAD
