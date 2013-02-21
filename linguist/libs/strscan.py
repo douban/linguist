@@ -9,6 +9,9 @@ class StringScanner(object):
         self.pos_history, self._pos = [0], 0
         self.match_history, self._match = [None], None
 
+    def __repr__(self):
+        return '<StringScanner pos: %s, match: %s>' % (self.pos, self.match)
+
     
     @property
     def is_eos(self):
@@ -37,6 +40,17 @@ class StringScanner(object):
         Return true if the scan pointer is at the end of the string. 
         """
         return self.string[self.pos:]
+
+    @property
+    def coords(self):
+        """
+        Return the current scanner position as `(lineno, columnno, line)`.
+
+        This method is useful for displaying the scanner position in a human-
+        readable way. For example, you could use it to provide friendlier
+        debugging information when writing parsers.
+        """
+        return text_coords(self.string, self.pos)
 
     @property
     def is_tainted(self):
@@ -106,7 +120,7 @@ class StringScanner(object):
         Return true if the scan pointer is at the beginning of a line.
         """
         if self.pos > len(self.string):
-            return None
+            return False
         elif self.pos == 0:
             return True
         return self.string[self.pos - 1] == "\n"
@@ -145,8 +159,6 @@ class StringScanner(object):
         characters matched (from the current position *up to* the end of the
         match).
         """
-
-
         regex = get_regex(regex)
         self.match = regex.search(self.string, self.pos)
         if not self.match:
@@ -220,6 +232,24 @@ class StringScanner(object):
         otherwise.
         """
         return self.search_full(regex, return_string=False, advance_pointer=False)
+
+
+def text_coords(string, position):
+    """
+    Transform a simple index into a human-readable position in a string.
+
+    This function accepts a string and an index, and will return a triple 
+    of `(lineno, columnno, line)` representing the position through the 
+    text. 
+    
+    It's useful for displaying a string index in a human-readable way.
+    """
+    line_start = string.rfind('\n', 0, position) + 1
+    line_end = string.find('\n', position)
+    lineno = string.count('\n', 0, position)
+    columnno = position - line_start
+    line = string[line_start:line_end]
+    return (lineno, columnno, line)
 
 
 def get_regex(regex):
