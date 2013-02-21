@@ -16,14 +16,7 @@ class Generated(object):
 
     @property
     def data(self):
-        if hasattr(self, 'real_data'):
-            return self.real_data
-
-        self.real_data = self._data
-        if hasattr(self._data, 'read'):
-            self.real_data = self._data.read()
-
-        return self.real_data
+        return self._data() if callable(self._data) else self._data
 
     @property
     def lines(self):
