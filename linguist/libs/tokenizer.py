@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 
-from .strscan import StringScanner
+from strscan import StringScanner
 
 """
 Generic programming language tokenizer.
@@ -30,7 +31,8 @@ MULTI_LINE_COMMENTS = [
     ['(*', '*)']     # Coq
 ]
 
-START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.escape(c), SINGLE_LINE_COMMENTS)))
+START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: ' *%s ' % re.escape(c), SINGLE_LINE_COMMENTS))) 
+'|'.join(map(lambda c: ' *%s ' % re.escape(c), SINGLE_LINE_COMMENTS))
 START_MULTI_LINE_COMMENT = re.compile('|'.join(map(lambda c: re.escape(c[0]), MULTI_LINE_COMMENTS)))
 
 class Tokenizer(object):
@@ -64,7 +66,7 @@ class Tokenizer(object):
         tokens = []
         while not s.is_eos:
             if s.pos >= BYTE_LIMIT: break
-            token = s.scan('^#!.+$')
+            token = s.scan(r'^#!.+')
             if token:
                 name = self.extract_shebang(token)
                 if name:
@@ -72,9 +74,8 @@ class Tokenizer(object):
                     continue
 
             # Single line comment
-            token = s.scan(SINGLE_LINE_COMMENTS)
-            if s.is_beginning_of_line and token:
-                s.skip_until('\n|\Z')
+            if s.is_beginning_of_line and s.scan(START_SINGLE_LINE_COMMENT):
+                s.skip_until(r'\n|\Z')
                 continue
 
             # Multiline comments
@@ -85,42 +86,42 @@ class Tokenizer(object):
                 continue
             
             # Skip single or double quoted strings
-            if s.scan('"'):
+            if s.scan(r'"'):
                 if s.peek(1) == '"':
                     s.getch
                 else:
-                    s.skip_until('[^\\]"')
-            if s.scan("'"):
+                    s.skip_until(r'[^\\]"')
+            if s.scan(r"'"):
                 if s.peek(1) == "'":
                     s.getch
                 else:
-                    s.skip_until("[^\\]'")
+                    s.skip_until(r"[^\\]'")
 
             # Skip number literals
-            if s.scan('(0x)?\d(\d|\.)*'):
+            if s.scan(r'(0x)?\d(\d|\.)*'):
                 continue
 
             # SGML style brackets
-            token = s.scan('<[^\s<>][^<>]*>')
+            token = s.scan(r'<[^\s<>][^<>]*>')
             if token:
                 for t in self.extract_sgml_tokens(token):
                     tokens.append(t)
                 continue
 
             # Common programming punctuation
-            token = s.scan(';|\{|\}|\(|\)|\[|\]')
+            token = s.scan(r';|\{|\}|\(|\)|\[|\]')
             if token:
                 tokens.append(token)
                 continue
 
             # Regular token
-            token = s.scan('[\w\.@#\/\*]+')
+            token = s.scan(r'[\w\.@#\/\*]+')
             if token:
                 tokens.append(token)
                 continue
 
             # Common operators
-            token = s.scan('<<?|\+|\-|\*|\/|%|&&?|\|\|?')
+            token = s.scan(r'<<?|\+|\-|\*|\/|%|&&?|\|\|?')
             if token:
                 tokens.append(token)
                 continue
@@ -145,14 +146,14 @@ class Tokenizer(object):
         Returns String token or nil it couldn't be parsed.
         """
         s = StringScanner(data)
-        path = s.scan('^#!\s*\S+')
+        path = s.scan(r'^#!\s*\S+')
         if path:
             script = path.split('/')[-1]
             if script == 'env':
-                s.scan('\s+')
-                script = s.scan('\S+')
+                s.scan(r'\s+')
+                script = s.scan(r'\S+')
             if script:
-                script = re.sub('[\d]+', '', script, 0)
+                script = re.compile(r'[^\d]+').match(script).group(0) 
             return script
         return
 
@@ -174,28 +175,28 @@ class Tokenizer(object):
         
         while not s.is_eos:
             # Emit start token
-            token = s.scan('<\/?[^\s>]+')
+            token = s.scan(r'<\/?[^\s>]+')
             if token:
-                tokens.append(token)
+                tokens.append(token + '>')
                 continue
 
             # Emit attributes with trailing =
-            token = s.scan('\w+=')
+            token = s.scan(r'\w+=')
             if token:
                 tokens.append(token)
 
                 # Then skip over attribute value
                 if s.scan('"'):
-                    s.skip_until('[^\\]"')
+                    s.skip_until(r'[^\\]"')
                     continue
                 if s.scan("'"):
-                    s.skip_until("[^\\]'")
+                    s.skip_until(r"[^\\]'")
                     continue
-                s.skip_until('\w+')
+                s.skip_until(r'\w+')
                 continue
 
             # Emit lone attributes
-            token = s.scan('\w+')
+            token = s.scan(r'\w+')
             if token:
                 tokens.append(token)
 

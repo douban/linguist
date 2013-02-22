@@ -12,13 +12,12 @@ class StringScanner(object):
     def __repr__(self):
         return '<StringScanner pos: %s, match: %s>' % (self.pos, self.match)
 
-    
     @property
     def is_eos(self):
         """
         Return true if the scan pointer is at the end of the string. 
         """
-        return self.pos == len(self.string)
+        return self.pos >= len(self.string)
 
     @property
     def getch(self):
