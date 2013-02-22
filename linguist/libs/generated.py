@@ -3,6 +3,9 @@
 import re
 from os.path import splitext
 
+XCODE_PROJECT_EXT_NAMES = ('.xib', '.nib', '.storyboard', '.pbxproj', 
+                           '.xcworkspacedata', '.xcuserstate')
+
 class Generated(object):
 
     def __init__(self, name, data):
@@ -16,7 +19,10 @@ class Generated(object):
 
     @property
     def data(self):
-        return self._data() if callable(self._data) else self._data
+        if hasattr(self, 'real_data'):
+            return self.real_data
+        self.real_data = self._data() if callable(self._data) else self._data
+        return self.real_data
 
     @property
     def lines(self):
@@ -41,7 +47,7 @@ class Generated(object):
         
         Returns True of False.
         """
-        return self.ext_name in ('.xib', '.nib', '.storyboard', '.pbxproj', '.xcworkspacedata', '.xcuserstate')
+        return self.ext_name in XCODE_PROJECT_EXT_NAMES 
 
     @property
     def is_minified_javascript(self):
