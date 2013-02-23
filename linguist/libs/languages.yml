@@ -6,7 +6,7 @@
 # version of pygments.
 #
 # type              - Either data, programming, markup, or nil
-# lexer             - An explicit lexer String (defaults to name.downcase)
+# lexer             - An explicit lexer String (defaults to name)
 # aliases           - An Array of additional aliases (implicitly
 #                     includes name.downcase)
 # ace_mode          - A String name of Ace Mode (if available)
@@ -108,6 +108,15 @@ AutoHotkey:
   aliases:
   - ahk
   primary_extension: .ahk
+
+Awk:
+  type: programming
+  lexer: Awk
+  primary_extension: .awk
+  extensions:
+  - .gawk
+  - .mawk
+  - .nawk
 
 Batchfile:
   type: programming
@@ -304,6 +313,8 @@ Delphi:
   color: "#b0ce4e"
   primary_extension: .pas
   extensions:
+  - .dfm
+  - .dpr
   - .lpr
 
 DCPU-16 ASM:
@@ -824,6 +835,8 @@ OCaml:
   color: "#3be133"
   primary_extension: .ml
   extensions:
+  - .eliom
+  - .eliomi
   - .mli
   - .mll
   - .mly
@@ -929,6 +942,12 @@ Perl:
   - .pod
   - .psgi
 
+PogoScript:
+  type: programming
+  color: "#d80074"
+  lexer: Text only
+  primary_extension: .pogo
+
 PowerShell:
   type: programming
   ace_mode: powershell
@@ -964,6 +983,7 @@ Python:
   color: "#3581ba"
   primary_extension: .py
   extensions:
+  - .gyp
   - .pyw
   - .wsgi
   - .xpy
@@ -997,6 +1017,12 @@ Racket:
   - .rktd
   - .rktl
 
+Ragel in Ruby Host:
+  type: programming
+  lexer: Ragel in Ruby Host
+  color: "#ff9c2e"
+  primary_extension: .rl
+
 Raw token data:
   search_term: raw
   aliases:
@@ -1014,6 +1040,13 @@ Rebol:
 
 Redcode:
   primary_extension: .cw
+
+Rouge:
+  type: programming
+  lexer: Clojure
+  ace_mode: clojure
+  color: "#cc0088"
+  primary_extension: .rg
 
 Ruby:
   type: programming
@@ -1250,6 +1283,7 @@ XML:
   - .kml
   - .mxml
   - .plist
+  - .pt
   - .rdf
   - .rss
   - .scxml
@@ -1270,6 +1304,7 @@ XML:
   - .xsd
   - .xsl
   - .xul
+  - .zcml
   filenames:
   - .classpath
   - .project
