@@ -30,8 +30,7 @@ MULTI_LINE_COMMENTS = [
     ['(*', '*)']     # Coq
 ]
 
-START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: ' *%s ' % re.escape(c), SINGLE_LINE_COMMENTS))) 
-'|'.join(map(lambda c: ' *%s ' % re.escape(c), SINGLE_LINE_COMMENTS))
+START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.escape(c), SINGLE_LINE_COMMENTS))) 
 START_MULTI_LINE_COMMENT = re.compile('|'.join(map(lambda c: re.escape(c[0]), MULTI_LINE_COMMENTS)))
 
 class Tokenizer(object):
