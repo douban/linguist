@@ -97,9 +97,10 @@ Assembly:
   - nasm
   primary_extension: .asm
 
-Augeas:
-  type: programming
-  primary_extension: .aug
+#FIXME bug by pygments
+# Augeas:
+#   type: programming
+#   primary_extension: .aug
 
 AutoHotkey:
   type: programming
@@ -194,6 +195,11 @@ C2hs Haskell:
   aliases:
   - c2hs
   primary_extension: .chs
+
+CLIPS:
+  type: programming
+  lexer: Text only
+  primary_extension: .clp
 
 CMake:
   primary_extension: .cmake
@@ -317,14 +323,15 @@ Delphi:
   - .dpr
   - .lpr
 
-DCPU-16 ASM:
-  type: programming
-  lexer: dasm16
-  primary_extension: .dasm16
-  extensions:
-  - .dasm
-  aliases:
-  - dasm16
+#FIXME bug by pygments
+# DCPU-16 ASM:
+#   type: programming
+#   lexer: dasm16
+#   primary_extension: .dasm16
+#   extensions:
+#   - .dasm
+#   aliases:
+#   - dasm16
 
 Diff:
   primary_extension: .diff
@@ -535,7 +542,9 @@ HTML+ERB:
   - erb
   primary_extension: .erb
   extensions:
+  - .erb.deface
   - .html.erb
+  - .html.erb.deface
 
 HTML+PHP:
   type: markup
@@ -550,6 +559,9 @@ Haml:
   group: HTML
   type: markup
   primary_extension: .haml
+  extensions:
+  - .haml.deface
+  - .html.haml.deface
 
 Handlebars:
   type: markup
@@ -580,6 +592,8 @@ INI:
   - .prefs
   - .properties
   primary_extension: .ini
+  filenames:
+  - .editorconfig
 
 IRC log:
   lexer: IRC logs
@@ -882,6 +896,8 @@ OpenCL:
   group: C
   lexer: C
   primary_extension: .cl
+  extensions:
+  - .opencl
 
 OpenEdge ABL:
   type: programming
@@ -1219,6 +1235,14 @@ Twig:
   lexer: HTML+Django/Jinja
   primary_extension: .twig
 
+TypeScript:
+  type: programming
+  color: "#31859c"
+  lexer: Text only
+  aliases:
+  - ts
+  primary_extension: .ts
+
 VHDL:
   type: programming
   lexer: vhdl
@@ -1326,6 +1350,12 @@ XSLT:
   group: XML
   primary_extension: .xslt
 
+Xtend:
+  type: programming
+  primary_extension: .xtend
+  extensions:
+  - .xtend
+
 YAML:
   type: markup
   aliases:
@@ -1340,6 +1370,13 @@ eC:
   primary_extension: .ec
   extensions:
   - .eh
+
+edn:
+  type: data
+  lexer: Clojure
+  ace_mode: clojure
+  color: "#db5855"
+  primary_extension: .edn
 
 fish:
   type: programming
