@@ -220,22 +220,23 @@ class Language(object):
         classified with other languages that have shebang scripts.
         """
         extname = splitext(name)[1]
-        if not extname and mode and int(mode, 8)&05 == 05:
+        if not extname and mode and (int(mode, 8)&05 == 05):
             name += ".script!"
 
         possible_languages = cls.find_by_filename(name)
-        if len(possible_languages) > 1:
-            data = data() if callable(data) else data
-            if data is None or data == "":
-                return None
-            _pns = [p.name for p in possible_languages]
-            result = Classifier.classify(DATA, data, _pns)
-            result = result and result[0]
-            if result:
-                return cls.find_by_name(result)
 
-        elif len(possible_languages) == 1:
+        if len(possible_languages) == 1:
             return possible_languages[0]
+
+        data = data() if callable(data) else data
+        if data is None or data == "":
+            return
+
+        _pns = [p.name for p in possible_languages]
+        result = Classifier.classify(DATA, data, _pns)
+        result = result and result[0][0]
+        if result:
+            return cls.find_by_name(result)
 
     def colorize(self, text, options={}):
         return highlight(text, self.lexer(), HtmlFormatter(**options))
