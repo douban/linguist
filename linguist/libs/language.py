@@ -2,7 +2,7 @@
 
 import re
 import urllib
-from os.path import realpath, dirname, basename, splitext
+from os.path import realpath, dirname, basename, splitext, join
 from collections import defaultdict
 
 import yaml
@@ -14,8 +14,8 @@ from classifier import Classifier
 from samples import Samples, DATA
 
 DIR = dirname(realpath(__file__))
-POPULAR_PATH = DIR + "/popular.yml"
-LANGUAGES_PATH = DIR + "/languages.yml"
+POPULAR_PATH = join(DIR, "popular.yml")
+LANGUAGES_PATH = join(DIR, "languages.yml")
 
 POPULAR = yaml.load(open(POPULAR_PATH))
 LANGUAGES = yaml.load(open(LANGUAGES_PATH))

@@ -6,8 +6,8 @@ from classifier import Classifier
 from md5 import MD5
 
 DIR = dirname(realpath(__file__))
-ROOT = dirname(dirname(DIR)) + "/samples"
-PATH = DIR + "/samples.json"
+ROOT = join(dirname(dirname(DIR)), "samples")
+PATH = join(DIR, "samples.json")
 DATA = {}
 
 if exists(PATH):

@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import re
-from framework import LinguistTestBase, main
+from os.path import join
+from framework import LinguistTestBase, main, ROOT_DIR
 from libs.tokenizer import Tokenizer
 
 
 class TestTokenizer(LinguistTestBase):
     
-
-    # def setUp(self):
-    #     super(TestTokenizer, self).setUp()
-
     def tokenize(self, data='', is_path=None):
         if is_path: 
-            data = open("../samples/" + str(data)).read()
+            data = open(join(join(ROOT_DIR, "samples"), str(data))).read()
         return Tokenizer.tokenize(data)
 
     def test_skip_string_literals(self):
