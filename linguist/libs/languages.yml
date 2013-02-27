@@ -97,7 +97,6 @@ Assembly:
   - nasm
   primary_extension: .asm
 
-#FIXME bug by pygments
 # Augeas:
 #   type: programming
 #   primary_extension: .aug
@@ -320,10 +319,8 @@ Delphi:
   primary_extension: .pas
   extensions:
   - .dfm
-  - .dpr
   - .lpr
 
-#FIXME bug by pygments
 # DCPU-16 ASM:
 #   type: programming
 #   lexer: dasm16
@@ -450,7 +447,6 @@ Forth:
   lexer: Text only
   extensions:
   - .4th
-  - .forth
   - .fth
 
 GAS:
@@ -592,8 +588,6 @@ INI:
   - .prefs
   - .properties
   primary_extension: .ini
-  filenames:
-  - .editorconfig
 
 IRC log:
   lexer: IRC logs
@@ -679,11 +673,6 @@ Lasso:
   ace_mode: lasso
   color: "#2584c3"
   primary_extension: .lasso
-  extensions:
-  - .inc
-  - .las
-  - .lasso9
-  - .ldml
 
 Less:
   type: markup
@@ -697,6 +686,17 @@ LilyPond:
   primary_extension: .ly
   extensions:
   - .ily
+
+Literate CoffeeScript:
+  type: programming
+  group: CoffeeScript
+  lexer: Text only
+  ace_mode: markdown
+  wrap: true
+  search_term: litcoffee
+  aliases:
+  - litcoffee
+  primary_extension: .litcoffee
 
 Literate Haskell:
   type: programming
@@ -729,7 +729,6 @@ Lua:
   primary_extension: .lua
   extensions:
   - .nse
-  - .pd_lua
 
 Makefile:
   aliases:
@@ -849,7 +848,6 @@ OCaml:
   color: "#3be133"
   primary_extension: .ml
   extensions:
-  - .eliom
   - .eliomi
   - .mli
   - .mll
@@ -884,8 +882,6 @@ Omgrofl:
   primary_extension: .omgrofl
   color: "#cabbff"
   lexer: Text only
-  extensions:
-  - .omgrofl
 
 Opa:
   type: programming
@@ -957,6 +953,14 @@ Perl:
   - .pm6
   - .pod
   - .psgi
+
+Pike:
+  type: programming
+  color: "#066ab2"
+  lexer: C
+  primary_extension: .pike
+  extensions:
+  - .pmod
 
 PogoScript:
   type: programming
@@ -1158,7 +1162,6 @@ Shell:
   - zsh
   primary_extension: .sh
   extensions:
-  - .bash
   - .tmux
 
 Smalltalk:
@@ -1181,8 +1184,15 @@ SuperCollider:
   color: "#46390b"
   lexer: Text only
   primary_extension: .sc
-  extensions:
-  - .scd
+
+# TOML:
+#   type: data
+#   primary_extension: .toml
+
+TXL:
+  type: programming
+  lexer: Text only
+  primary_extension: .txl
 
 Tcl:
   type: programming
@@ -1326,7 +1336,6 @@ XML:
   - .xlf
   - .xliff
   - .xsd
-  - .xsl
   - .xul
   - .zcml
   filenames:
@@ -1346,15 +1355,15 @@ XS:
   primary_extension: .xs
 
 XSLT:
-  type: markup
+  type: programming
   group: XML
   primary_extension: .xslt
+  extensions:
+    - .xsl
 
 Xtend:
   type: programming
   primary_extension: .xtend
-  extensions:
-  - .xtend
 
 YAML:
   type: markup
