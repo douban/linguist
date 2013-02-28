@@ -39,6 +39,9 @@ class FileBlob(BlobHelper):
         """
         self.name = base_path and path.replace('%s/' %base_path, '', 1) or path 
 
+    def __repr__(self):
+        return '<FileBlob name:%s>' % self.name
+
     @property
     def stat(self):
         return stat(self.path)

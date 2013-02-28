@@ -31,6 +31,9 @@ class Repository(object):
         self._language = self._size = None
         self.sizes = defaultdict(int)
 
+    def __repr__(self):
+        return '<Repository computed_stats:%s>' % self.computed_stats
+
     @classmethod
     def from_directory(cls, base_path):
         """

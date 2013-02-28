@@ -4,6 +4,9 @@ import hashlib
 
 class MD5(object):
 
+    def __repr__(self):
+        return '<MD5>'
+
     @classmethod
     def hexdigest(cls, obj):
         digest = hashlib.md5()

@@ -13,11 +13,13 @@ DATA = {}
 if exists(PATH):
     DATA = json.load(open(PATH))
 
-
 class Samples(object):
     """
     Model for accessing classifier training data.
     """
+
+    def __repr__(self):
+        return '<Samples>'
 
     @classmethod
     def generate(self):

@@ -34,6 +34,9 @@ START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.esca
 START_MULTI_LINE_COMMENT = re.compile('|'.join(map(lambda c: re.escape(c[0]), MULTI_LINE_COMMENTS)))
 
 class Tokenizer(object):
+    
+    def __repr__(self):
+        return '<tokenizer>'
 
     @classmethod
     def tokenize(cls, data):

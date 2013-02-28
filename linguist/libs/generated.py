@@ -14,6 +14,9 @@ class Generated(object):
         self.ext_name = splitext(self.name)[1]
         self._data = data
 
+    def __repr__(self):
+        return '<Generated name:%s>' % self.name
+
     @classmethod
     def is_generated(cls, name, data):
         return cls(name, data)._is_generated

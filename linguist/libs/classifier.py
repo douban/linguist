@@ -50,6 +50,9 @@ class Classifier(object):
         self.languages_total = db.get('languages_total')
         self.language_tokens = db.get('language_tokens')
 
+    def __repr__(self):
+        return '<Classifier>'
+
     @classmethod
     def classify(cls, db, tokens, languages=[]):
         """
