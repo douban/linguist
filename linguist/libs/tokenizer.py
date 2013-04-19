@@ -18,7 +18,7 @@ BYTE_LIMIT = 100000
 SINGLE_LINE_COMMENTS = [
     '//', # C
     '#',  # Python, Ruby
-    '%',  # Tex 
+    '%',  # Tex
 ]
 
 # Start state on opening token, ignore anything until the closing
@@ -27,14 +27,15 @@ MULTI_LINE_COMMENTS = [
     ['/*', '*/'],    # C
     ['<!--', '-->'], # XML
     ['{-', '-}'],    # Haskell
-    ['(*', '*)']     # Coq
+    ['(*', '*)'],    # Coq
+    ['"""', '"""'],  # Python
 ]
 
-START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.escape(c), SINGLE_LINE_COMMENTS))) 
+START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.escape(c), SINGLE_LINE_COMMENTS)))
 START_MULTI_LINE_COMMENT = re.compile('|'.join(map(lambda c: re.escape(c[0]), MULTI_LINE_COMMENTS)))
 
 class Tokenizer(object):
-    
+
     def __repr__(self):
         return '<tokenizer>'
 
@@ -85,7 +86,7 @@ class Tokenizer(object):
                 close_token = dict(MULTI_LINE_COMMENTS).get(token)
                 s.skip_until(re.compile(re.escape(close_token)))
                 continue
-            
+
             # Skip single or double quoted strings
             if s.scan(r'"'):
                 if s.peek(1) == '"':
@@ -135,15 +136,15 @@ class Tokenizer(object):
     def extract_shebang(cls, data):
         """
         Internal: Extract normalized shebang command token.
-        
+
         Examples
-        
+
           extract_shebang("#!/usr/bin/ruby")
           # => "ruby"
-        
+
           extract_shebang("#!/usr/bin/env node")
           # => "node"
-        
+
         Returns String token or nil it couldn't be parsed.
         """
         s = StringScanner(data)
@@ -154,26 +155,26 @@ class Tokenizer(object):
                 s.scan(r'\s+')
                 script = s.scan(r'\S+')
             if script:
-                script = re.compile(r'[^\d]+').match(script).group(0) 
+                script = re.compile(r'[^\d]+').match(script).group(0)
             return script
         return
 
     def extract_sgml_tokens(self, data):
         """
         Internal: Extract tokens from inside SGML tag.
-            
+
         data - SGML tag String.
-            
+
             Examples
-            
+
               extract_sgml_tokens("<a href='' class=foo>")
               # => ["<a>", "href="]
-            
+
         Returns Array of token Strings.
         """
         s = StringScanner(data)
         tokens = []
-        
+
         while not s.is_eos:
             # Emit start token
             token = s.scan(r'<\/?[^\s>]+')
