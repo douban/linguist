@@ -6,8 +6,8 @@ import mimetypes
 from os.path import realpath, dirname, splitext, basename, join
 
 import yaml
-import chardet
-from pygments import lexers 
+import charlockholmes
+from pygments import lexers
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 
@@ -21,10 +21,12 @@ VENDOR_PATH = join(DIR, "vendor.yml")
 VENDORED_PATHS = yaml.load(open(VENDOR_PATH))
 VENDORED_REGEXP = re.compile('|'.join(VENDORED_PATHS))
 
+# TODO python mimetypes 很不全
 if not mimetypes.inited:
     mimetypes.init()
     mimetypes.add_type('application/x-ruby', '.rb')
     mimetypes.add_type('application/x-python', '.py')
+
 
 class BlobHelper(object):
     """
@@ -43,7 +45,7 @@ class BlobHelper(object):
 
         Returns a String
         """
-        return splitext(self.name)[1]
+        return splitext(self.name)[1].lower()
 
     @property
     def _mime_type(self):
@@ -58,7 +60,7 @@ class BlobHelper(object):
         Returns a mime type String.
         """
         if hasattr(self, '__mime_type'):
-            return self.__mime_type 
+            return self.__mime_type
         _type, _encoding = mimetypes.guess_type(self.name)
         self.__mime_encodeing = _encoding
         self.__mime_type = _type
@@ -150,7 +152,7 @@ class BlobHelper(object):
             return self._detect_encoding
 
         if self.data:
-            self._detect_encoding = chardet.detect(self.data)
+            self._detect_encoding = charlockholmes.detect(self.data)
         return self._detect_encoding
 
     @property
@@ -166,10 +168,19 @@ class BlobHelper(object):
     def is_solid(self):
         """
         Public: Is the blob a support 3D model format?
-        
+
         Return true or false
         """
         return self.ext_name in ('.stl', '.obj')
+
+    @property
+    def is_pdf(self):
+        """
+        Public: Is the blob a supported 3D model format?
+
+        Return true or false
+        """
+        return self.ext_name == '.pdf'
 
     @property
     def is_text(self):
@@ -193,7 +204,6 @@ class BlobHelper(object):
             return True
         else:
             # If Charlock says its binary
-            # TODO
             return self.detect_encoding.get('type') == 'binary'
 
     @property
@@ -322,19 +332,19 @@ class BlobHelper(object):
         Returns true when mac format is detected.
         """
         if not self.is_viewable:
-            return 
+            return
 
         data = self.data[0:4096]
         if '\r' in data:
             pos = data.index('\r')
-            return data[pos+1] != '\n'
+            return data[pos + 1] != '\n'
 
     @property
     def is_generated(self):
         """
         Public: Is the blob a generated file?
-        
-        Generated source code is supressed in diffs and is ignored by
+
+        Generated source code is suppressed in diffs and is ignored by
         language statistics.
 
         May load Blob#data
@@ -354,11 +364,11 @@ class BlobHelper(object):
     def is_indexable(self):
         """
         Public: Should the blob be indexed for searching?
-        
+
         Excluded:
           - Files over 0.1MB
           - Non-text files
-          - Langauges marked as not searchable
+          - Languages marked as not searchable
           - Generated source files
 
         Please add additional test coverage to
@@ -380,7 +390,6 @@ class BlobHelper(object):
             return False
         else:
             return False
-
 
     @property
     def language(self):
@@ -419,7 +428,7 @@ class BlobHelper(object):
         Returns html String
         """
         if not self.is_safe_to_colorize:
-            return 
+            return
         return highlight(self.data, self.lexer(), HtmlFormatter(**options))
 
     def colorize_without_wrapper(self, options={}):
