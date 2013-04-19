@@ -12,15 +12,15 @@ class Classifier(object):
     def train(cls, db, language, data):
         """
         Public: Train classifier that data is a certain language.
-          
+
           db       - Hash classifier database object
           language - String language of data
           data     - String contents of file
-          
+
           Examples
-          
+
             Classifier.train(db, 'Ruby', "def hello; end")
-          
+
           Returns nothing.
         """
         tokens = Tokenizer.tokenize(data)
@@ -57,16 +57,16 @@ class Classifier(object):
     def classify(cls, db, tokens, languages=[]):
         """
         Public: Guess language of data.
-        
+
         db        - Hash of classifer tokens database.
         data      - Array of tokens or String data to analyze.
         languages - Array of language name Strings to restrict to.
-        
+
         Examples
-        
+
           Classifier.classify(db, "def hello; end")
           # => [ 'Ruby', 0.90], ['Python', 0.2], ... ]
-        
+
         Returns sorted Array of result pairs. Each pair contains the
         String language name and a Float score.
         """
@@ -85,7 +85,7 @@ class Classifier(object):
         """
         if tokens is None:
             return []
-        
+
         if isinstance(tokens, str):
             tokens = Tokenizer.tokenize(tokens)
 
@@ -99,10 +99,10 @@ class Classifier(object):
     def tokens_probability(self, tokens, language):
         """
         Internal: Probably of set of tokens in a language occuring - P(D | C)
-        
+
         tokens   - Array of String tokens.
         language - Language to check.
-        
+
         Returns Float between 0.0 and 1.0.
         """
         token_probability = partial(self.token_probability, language=language)
@@ -112,10 +112,10 @@ class Classifier(object):
     def token_probability(self, token, language=''):
         """
         Internal: Probably of token in language occuring - P(F | C)
-        
+
         token    - String token.
         language - Language to check.
-        
+
         Returns Float between 0.0 and 1.0.
         """
         probability = float(self.tokens.get(language, {}).get(token, 0))

@@ -55,7 +55,7 @@ class TestLanguage(LinguistTestBase):
         assert find_lexer_class('Scheme') == Language.find_by_name('Scheme').lexer
         assert find_lexer_class('Standard ML') == Language.find_by_name('Standard ML').lexer
         assert find_lexer_class('TeX') == Language.find_by_name('TeX').lexer
-        #FIXME bug by pygments 
+        #FIXME bug by pygments
         # assert find_lexer_class('Verilog') == Language.find_by_name('Verilog').lexer
         assert find_lexer_class('XSLT') == Language.find_by_name('XSLT').lexer
         assert find_lexer_class('aspx-vb') == Language.find_by_name('ASP').lexer
@@ -139,7 +139,6 @@ class TestLanguage(LinguistTestBase):
         assert Language.find_by_name('Shell') == Language.find_by_name('Gentoo Ebuild').group
         assert Language.find_by_name('Shell') == Language.find_by_name('Gentoo Eclass').group
         assert Language.find_by_name('Shell') == Language.find_by_name('Tcsh').group
-        assert Language.find_by_name('XML') == Language.find_by_name('XSLT').group
 
         # Ensure everyone has a group
         for language in Language.all():

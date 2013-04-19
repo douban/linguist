@@ -63,7 +63,7 @@ class TestFileBob(LinguistTestBase):
 
     def test_lines(self):
         assert ["module Foo", "end", ""] == self.blob("Ruby/foo.rb").lines
- 
+
     def test_mac_format(self):
         assert self.blob("Text/mac.txt").is_mac_format
 
@@ -136,6 +136,9 @@ class TestFileBob(LinguistTestBase):
         # assert not self.blob("Binary/octocat.ai").is_viewable
         assert not self.blob("Binary/octocat.png").is_viewable
 
+    def test_pdf(self):
+        assert self.blob("Binary/foo.pdf").is_pdf
+
     def test_generated(self):
         assert not self.blob("Text/README").is_generated
 
@@ -180,10 +183,6 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("JavaScript/intro.js").is_generated
         assert self.blob("JavaScript/classes.js").is_generated
 
-        # Cython-is_generated C/C++
-        assert self.blob("C/sgd_fast.c").is_generated
-        assert self.blob("C++/wrapper_inner.cpp").is_generated
-
     def test_vendored(self):
         assert not self.blob("Text/README").is_vendored
         assert not self.blob("ext/extconf.rb").is_vendored
@@ -197,7 +196,7 @@ class TestFileBob(LinguistTestBase):
         # C deps
         assert  self.blob("deps/http_parser/http_parser.c").is_vendored
         assert  self.blob("deps/v8/src/v8.h").is_vendored
-        
+
         # Debian packaging
         assert  self.blob("debian/cron.d").is_vendored
 

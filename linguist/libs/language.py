@@ -54,7 +54,7 @@ class Language(object):
         cls.index[name] = cls.name_index[name] = language
         cls.index[name.lower()] = cls.name_index[name.lower()] = language
 
-        # All Language aliases should be unique. 
+        # All Language aliases should be unique.
         # Raise if there is a duplicate.
         for name in language.aliases:
             if cls.alias_index.has_key(name):
@@ -126,7 +126,7 @@ class Language(object):
             self._group = self
 
     def __repr__(self):
-        return '<Language name:%s>' % self.name 
+        return '<Language name:%s>' % self.name
 
     def __eq__(self, target):
         return self.name == target.name and self.extensions == target.extensions
@@ -139,7 +139,7 @@ class Language(object):
         name - The String name of the Language
 
          Examples
-         
+
            Language.find_by_name('Ruby')
            # => #<Language name:"Ruby">
 
@@ -192,7 +192,7 @@ class Language(object):
         cls._ace_modes = sorted(filter(lambda l: l.ace_mode, cls.all()), key=lambda l: l.name.lower())
         return cls._ace_modes
 
-        
+
     @classmethod
     def all(cls):
         """
@@ -209,14 +209,14 @@ class Language(object):
 
           name - String filename
           data - String blob data. A block also maybe passed in for lazy
-                 loading. This behavior is deprecated and you should 
+                 loading. This behavior is deprecated and you should
                  always pass in a String.
           mode - Optional String mode (defaults to nil)
 
         Returns Language or nil.
 
-        A bit of an elegant hack. If the file is exectable but 
-        extensionless, append a "magic" extension so it can be 
+        A bit of an elegant hack. If the file is executable but
+        extensionless, append a "magic" extension so it can be
         classified with other languages that have shebang scripts.
         """
         extname = splitext(name)[1]
