@@ -1,0 +1,5 @@
+include linguist/libs/languages.yml
+include linguist/libs/popular.yml
+include linguist/libs/vendor.yml
+include linguist/libs/samples.json
+include samples/*
