@@ -37,7 +37,9 @@ class FileBlob(BlobHelper):
 
         Returns a String
         """
-        self.name = base_path and path.replace('%s/' %base_path, '', 1) or path 
+        if base_path:
+            base_path = base_path.rstrip('/')
+        self.name = base_path and path.replace('%s/' % base_path, '', 1) or path
 
     def __repr__(self):
         return '<FileBlob name:%s>' % self.name
@@ -50,7 +52,7 @@ class FileBlob(BlobHelper):
     def mode(self):
         """
         Public: Read file permissions
-        
+
         Returns a String like '100644'
         """
         mode = self.stat.st_mode
@@ -60,7 +62,7 @@ class FileBlob(BlobHelper):
     def data(self):
         """
         Public: Read file contents.
-        
+
         Returns a String.
         """
         if hasattr(self, '_data'):
@@ -75,4 +77,4 @@ class FileBlob(BlobHelper):
 
         Returns an Integer.
         """
-        return self.stat.st_size 
+        return self.stat.st_size
