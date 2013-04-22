@@ -6,7 +6,7 @@ from libs.repository import Repository
 from libs.language import Language
 
 class TestRepository(LinguistTestBase):
-    
+
     def repo(self, base_path):
         return Repository.from_directory(base_path)
 
@@ -17,14 +17,10 @@ class TestRepository(LinguistTestBase):
         assert self.linguist_repo().language == Language.find_by_name('Python')
 
     def test_linguist_languages(self):
-        """
         assert self.linguist_repo().languages[Language.find_by_name('Python')] > 2000
-        """
 
     def test_linguist_size(self):
-        """
         assert self.linguist_repo().size > 3000
-        """
 
     def test_binary_override(self):
         assert self.repo(ROOT_DIR + '/samples/Nimrod').language == Language.find_by_name('Nimrod')
