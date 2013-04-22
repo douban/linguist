@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Linguist by liluo</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Linguist</h1>
+          <h2>Language Savant, Python clone of github/linguist.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/liluo/linguist/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/liluo/linguist/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/liluo/linguist" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>Linguist</h1>
+
+<p>Language Savant, Python clone of <a href="https://github.com/github/linguist/">github/linguist</a>.</p>
+
+<h2>Installation</h2>
+
+<p>PIP</p>
+
+<div class="highlight"><pre>pip install linguist
+</pre></div>
+
+<p>Easy_install</p>
+
+<div class="highlight"><pre>easy_install linguist
+</pre></div>
+
+<h2>Features</h2>
+
+<h4>Language detection</h4>
+
+<p>Linguist defines the list of all languages known to GitHub in a <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/languages.yml">yaml file</a>. In order for a file to be highlighted, a language and lexer must be defined there.</p>
+
+<p>Most languages are detected by their file extension. This is the fastest and most common situation.</p>
+
+<p>For disambiguating between files with common extensions, we use a <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/classifier.py">Bayesian classifier</a>. For an example, this helps us tell the difference between <code>.h</code> files which could be either C, C++, or Obj-C.</p>
+
+<p>For testing, there is a simple FileBlob API:</p>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">linguist.libs.file_blob</span> <span class="kn">import</span> <span class="n">FileBlob</span>
+
+<span class="n">FileBlob</span><span class="p">(</span><span class="s">'test.py'</span><span class="p">)</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">name</span> <span class="c">#=&gt; 'Python'</span>
+
+<span class="n">FileBlob</span><span class="p">(</span><span class="s">'test_file'</span><span class="p">)</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">name</span> <span class="c">#=&gt; 'Python'</span>
+</pre></div>
+
+<p>See <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/language.py">linguist/libs/language.py</a> and <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/languages.yml">lib/linguist/languages.yml</a>.</p>
+
+<h4>Syntax Highlighting</h4>
+
+<p>The actual syntax highlighting is handled by our Pygments wrapper, <a href="https://bitbucket.org/birkenfeld/pygments-main">pygments</a>. It also provides a Lexer abstraction that determines which highlighter should be used on a file.</p>
+
+<p>We typically run on a pre-release version of Pygments, pygments.rb, to get early access to new lexers. The languages.yml file is a dump of the lexers we have available on our server.</p>
+
+<h4>Stats</h4>
+
+<p>The Language Graph you see on every repository is built by aggregating the languages of all repo's blobs.</p>
+
+<p>The repository stats API can be used on a directory:</p>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">linguist.libs.repository</span> <span class="kn">import</span> <span class="n">Repository</span>
+
+<span class="n">project</span> <span class="o">=</span> <span class="n">Repository</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span><span class="s">"."</span><span class="p">)</span>
+
+<span class="n">project</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">name</span> <span class="c">#=&gt; 'Python'</span>
+
+<span class="n">project</span><span class="o">.</span><span class="n">languages</span> <span class="c">#=&gt; defaultdict(&lt;type 'int'&gt;, {&lt;Language name:Python&gt;: 53446, &lt;Language name:JavaScript&gt;: 1991})</span>
+
+<span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">projects</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">lang</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span>
+<span class="c">#=&gt; Python, 53446</span>
+<span class="c">#=&gt; JavaScript, 1991</span>
+</pre></div>
+
+<h4>Todo</h4>
+
+<p>These stats are also printed out by the binary. Try running <code>linguist</code> on itself.</p>
+
+<h4>Ignore vendored files</h4>
+
+<p>Checking other code into your git repo is a common practice. But this often inflates your project's language stats and may even cause your project to be labeled as another language. We are able to identify some of these files and directories and exclude them.</p>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">linguist.libs.file_blob</span> <span class="kn">import</span> <span class="n">FileBlob</span>
+
+<span class="n">FileBlob</span><span class="p">(</span><span class="s">'static/js/jquery-2.0.0.min.js'</span><span class="p">)</span><span class="o">.</span><span class="n">is_vendored</span> <span class="c">#=&gt; True</span>
+</pre></div>
+
+<p>See <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/blob_helper.py#L279">BlobHelper#is_vendored</a> and <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/vendor.yml">linguist/libs/vendor.yml</a>.</p>
+
+<h4>Generated file detection</h4>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">linguist.libs.file_blob</span> <span class="kn">import</span> <span class="n">FileBlob</span>
+
+<span class="n">FileBlob</span><span class="p">(</span><span class="s">'jquery-2.0.0.min.js'</span><span class="p">)</span><span class="o">.</span><span class="n">is_generated</span> <span class="c">#=&gt; True</span>
+<span class="n">FileBlob</span><span class="p">(</span><span class="s">'app.coffee'</span><span class="p">)</span><span class="o">.</span><span class="n">is_generated</span> <span class="c">#=&gt; True</span>
+</pre></div>
+
+<p>See <a href="https://github.com/liluo/linguist/blob/master/linguist/libs/generated.py">Generated#is_generated</a>.</p>
+
+<h2>Contributing</h2>
+
+<div class="highlight"><pre>* Fork the repository.
+* Create a topic branch.
+* Implement your feature or bug fix.
+* Add, commit, and push your changes.
+* Submit a pull request.
+</pre></div>
+
+<h4>Testing</h4>
+
+<div class="highlight"><pre><span class="nb">cd </span>tests/
+python run.py
+</pre></div>
+
+<h2>Changelog</h2>
+
+<p><strong>v0.0.1 [2013-04-22]</strong></p>
+
+<ul>
+<li>Release v0.0.1</li>
+</ul>
+        </section>
+
+        <footer>
+          Linguist is maintained by <a href="https://github.com/liluo">liluo</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
