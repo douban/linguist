@@ -3,7 +3,7 @@
 import re
 import urllib
 import mimetypes
-from os.path import realpath, dirname, splitext, basename, join
+from os.path import realpath, dirname, splitext, basename, join, islink
 
 import yaml
 import charlockholmes
@@ -49,6 +49,15 @@ class BlobHelper(object):
 
     @property
     def _mime_type(self):
+        if hasattr(self, '__mime_type'):
+            return self.__mime_type
+        _type, _encoding = mimetypes.guess_type(self.name)
+        self.__mime_encodeing = _encoding
+        self.__mime_type = _type
+        return _type
+
+    @property
+    def mime_type(self):
         """
         Public: Get the actual blob mime type
 
@@ -59,15 +68,6 @@ class BlobHelper(object):
 
         Returns a mime type String.
         """
-        if hasattr(self, '__mime_type'):
-            return self.__mime_type
-        _type, _encoding = mimetypes.guess_type(self.name)
-        self.__mime_encodeing = _encoding
-        self.__mime_type = _type
-        return _type
-
-    @property
-    def mime_type(self):
         return self._mime_type or 'text/plain'
 
     @property
@@ -390,6 +390,10 @@ class BlobHelper(object):
             return False
         else:
             return False
+
+    @property
+    def is_link(self):
+        return islink(self.path)
 
     @property
     def language(self):

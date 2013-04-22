@@ -61,12 +61,12 @@ class Repository(object):
     def languages(self):
         """
         Public: Returns a breakdown of language stats.
-         
+
           Examples
-         
+
             # => { Language['Ruby'] => 46319,
                    Language['JavaScript'] => 258 }
-         
+
           Returns a Hash of Language keys and Integer size values.
         """
         self.compute_stats
@@ -103,6 +103,10 @@ class Repository(object):
             return
 
         for blob in self.enum:
+            # Skip files that are link
+            if blob.is_link:
+                continue
+
             # Skip files that are likely binary
             if blob.is_likely_binary:
                 continue
