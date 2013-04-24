@@ -11,6 +11,10 @@ install:
   - pip install pygments>=1.6
   - pip install charlockholmes
 
+branches:
+  only:
+    - master
+
 script:
   - cd tests
   - python run.py
