@@ -1,5 +1,6 @@
 Linguist
 ========
+[![Build Status](https://travis-ci.org/liluo/linguist.png)](https://travis-ci.org/liluo/linguist)
 
 Language Savant, Python clone of [github/linguist](https://github.com/github/linguist/).
 
