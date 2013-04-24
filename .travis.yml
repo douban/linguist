@@ -1,4 +1,4 @@
-before_install: sudo apt-get install libicu-dev file libmagic-dev -y
+before_install: sudo apt-get install libicu-dev libmagic-dev -y
 
 language: python
 
