@@ -1,4 +1,4 @@
-before_install: sudo apt-get install file libmagic-dev -y
+before_install: sudo apt-get install libicu-dev file libmagic-dev -y
 
 language: python
 
@@ -7,14 +7,14 @@ python:
   - "2.7"
 
 install:
-  - pip install PyYAML
-  - pip install pygments>=1.6
-  - pip install charlockholmes
+  - "pip install PyYAML"
+  - "pip install pygments>=1.6"
+  - "pip install charlockholmes"
 
 branches:
   only:
     - master
 
 script:
-  - cd tests
-  - python run.py
+  - "cd tests"
+  - "python run.py"
