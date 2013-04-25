@@ -36,7 +36,7 @@ class TestFileBob(LinguistTestBase):
     def test_mime_type(self):
         assert 'application/postscript' == self.blob('Binary/octocat.ai').mime_type
         assert 'application/x-ruby' == self.blob("Ruby/grit.rb").mime_type
-        # assert "application/x-sh" == self.blob("Shell/script.sh").mime_type
+        assert "application/x-sh" == self.blob("Shell/script.sh").mime_type
         assert "application/xml" == self.blob("XML/bar.xml").mime_type
         assert "audio/ogg" == self.blob("Binary/foo.ogg").mime_type
         assert "text/plain" == self.blob("Text/README").mime_type
@@ -45,14 +45,13 @@ class TestFileBob(LinguistTestBase):
         assert "application/pdf" == self.blob("Binary/foo.pdf").content_type
         # assert "audio/ogg" == self.blob("Binary/foo.ogg").content_type
         assert "image/png" == self.blob("Binary/foo.png").content_type
-        # assert "text/plain; charset=iso-8859-2" == self.blob("Text/README").content_type
+        assert "text/plain; charset=iso-8859-2" == self.blob("Text/README").content_type
 
     def test_disposition(self):
-    #     assert "attachment; filename=foo+bar.jar" == self.blob("Binary/foo bar.jar").disposition
-    #     assert "attachment; filename=foo.bin" == self.blob("Binary/foo.bin").disposition
-    #     assert "attachment; filename=linguist.gem" == self.blob("Binary/linguist.gem").disposition
-    # FIXME runtime too lang
-    #     assert "attachment; filename=octocat.ai" == self.blob("Binary/octocat.ai").disposition
+        assert "attachment; filename=foo+bar.jar" == self.blob("Binary/foo bar.jar").disposition
+        assert "attachment; filename=foo.bin" == self.blob("Binary/foo.bin").disposition
+        assert "attachment; filename=linguist.gem" == self.blob("Binary/linguist.gem").disposition
+        assert "attachment; filename=octocat.ai" == self.blob("Binary/octocat.ai").disposition
         assert "inline" == self.blob("Text/README").disposition
         assert "inline" == self.blob("Text/foo.txt").disposition
         assert "inline" == self.blob("Ruby/grit.rb").disposition
@@ -80,11 +79,11 @@ class TestFileBob(LinguistTestBase):
         assert 2 == self.blob("Ruby/foo.rb").sloc
 
     def test_encoding(self):
-        pass
-        # assert "ISO-8859-2" == self.blob("Text/README").encoding
-        # assert "ISO-8859-1" == self.blob("Text/dump.sql").encoding
-        # assert "UTF-8" == self.blob("Text/foo.txt").encoding
-        # assert None == self.blob("Binary/dog.o").encoding
+        # pass
+        assert "ISO-8859-2" == self.blob("Text/README").encoding
+        assert "ISO-8859-1" == self.blob("Text/dump.sql").encoding
+        assert "UTF-8" == self.blob("Text/foo.txt").encoding
+        assert None == self.blob("Binary/dog.o").encoding
 
     def test_binary(self):
         # Large blobs aren't loaded
@@ -94,13 +93,13 @@ class TestFileBob(LinguistTestBase):
         # end
         # assert large_blob.binary
 
-        # assert self.blob("Binary/git.deb").is_binary
-        # assert self.blob("Binary/git.exe").is_binary
-        # assert self.blob("Binary/hello.pbc").is_binary
-        # assert self.blob("Binary/linguist.gem").is_binary
-        # assert self.blob("Binary/octocat.ai").is_binary
+        assert self.blob("Binary/git.deb").is_binary
+        assert self.blob("Binary/git.exe").is_binary
+        assert self.blob("Binary/hello.pbc").is_binary
+        assert self.blob("Binary/linguist.gem").is_binary
+        assert self.blob("Binary/octocat.ai").is_binary
         assert self.blob("Binary/octocat.png").is_binary
-        # assert self.blob("Binary/zip").is_binary
+        assert self.blob("Binary/zip").is_binary
         assert not self.blob("Text/README").is_binary
         assert not self.blob("Text/file.txt").is_binary
         assert not self.blob("Ruby/foo.rb").is_binary
@@ -131,9 +130,8 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("Text/README").is_viewable
         assert self.blob("Ruby/foo.rb").is_viewable
         assert self.blob("Perl/script.pl").is_viewable
-        # assert not self.blob("Binary/linguist.gem").is_viewable
-        # FIXME runtime too long
-        # assert not self.blob("Binary/octocat.ai").is_viewable
+        assert not self.blob("Binary/linguist.gem").is_viewable
+        assert not self.blob("Binary/octocat.ai").is_viewable
         assert not self.blob("Binary/octocat.png").is_viewable
 
     def test_pdf(self):
