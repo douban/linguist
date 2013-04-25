@@ -225,6 +225,9 @@ class Language(object):
 
         possible_languages = cls.find_by_filename(name)
 
+        if not possible_languages:
+            return
+
         if len(possible_languages) == 1:
             return possible_languages[0]
 
