@@ -26,6 +26,7 @@ if not mimetypes.inited:
     mimetypes.init()
     mimetypes.add_type('application/x-ruby', '.rb')
     mimetypes.add_type('application/x-python', '.py')
+    mimetypes.add_type('application/x-sh', '.sh')
 
 
 class BlobHelper(object):
@@ -235,7 +236,7 @@ class BlobHelper(object):
 
         Returns Integer
         """
-        return len(filter(re.compile('\S').match, self.lines))
+        return len(filter(re.compile('\S').search, self.lines))
 
     @property
     def is_safe_to_colorize(self):
