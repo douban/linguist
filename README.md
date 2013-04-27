@@ -20,7 +20,7 @@ easy_install linguist
 
 #### Language detection
 
-Linguist defines the list of all languages known to GitHub in a [yaml file](https://github.com/liluo/linguist/blob/master/linguist/libs/languages.yml). In order for a file to be highlighted, a language and lexer must be defined there.
+Linguist defines the list of all languages known in a [yaml file](https://github.com/liluo/linguist/blob/master/linguist/libs/languages.yml). In order for a file to be highlighted, a language and lexer must be defined there.
 
 Most languages are detected by their file extension. This is the fastest and most common situation.
 
@@ -41,9 +41,7 @@ See [linguist/libs/language.py](https://github.com/liluo/linguist/blob/master/li
 
 #### Syntax Highlighting
 
-The actual syntax highlighting is handled by our Pygments wrapper, [pygments](https://bitbucket.org/birkenfeld/pygments-main). It also provides a Lexer abstraction that determines which highlighter should be used on a file.
-
-We typically run on a pre-release version of Pygments, pygments.rb, to get early access to new lexers. The languages.yml file is a dump of the lexers we have available on our server.
+The actual syntax highlighting is handled by [pygments](https://bitbucket.org/birkenfeld/pygments-main). It also provides a Lexer abstraction that determines which highlighter should be used on a file.
 
 #### Stats
 
@@ -60,15 +58,32 @@ project.language.name #=> 'Python'
 
 project.languages #=> defaultdict(<type 'int'>, {<Language name:Python>: 53446, <Language name:JavaScript>: 1991})
 
-for lang, count in projects.iteritems():
+for lang, count in projects.languages.iteritems():
     print lang.name, count
 #=> Python, 53446
 #=> JavaScript, 1991
 ```
 
-#### Todo
+These stats are also printed out by the binary. Try running `pylinguist [dir_path|file_path]`:
 
-These stats are also printed out by the binary. Try running `linguist` on itself.
+```bash
+$ pylinguist ~/douban/proj/code/
+60.8% JavaScript
+39.1% Python
+0.1% Shell
+
+$ pylinguist static/js/lib/jquery.min.js
+static/js/lib/jquery.min.js: 2 lines (2 sloc)
+  type: Text
+  language: JavaScript
+  appears to be generated source code
+  appears to be a vendored file
+
+$ pylinguist config.py
+config.py: 34 lines (23 sloc)
+  type: Text
+  language: Python
+```
 
 #### Ignore vendored files
 
@@ -112,6 +127,11 @@ python run.py
 ```
 
 ## Changelog
+__v0.0.2 [2013-04-25]__
+* Added script `pylinguist`
+* Disable detech unknown ext file
+* Bugfix count blob sloc
+* Added some unittest
 
 __v0.0.1 [2013-04-22]__
 * Release v0.0.1
