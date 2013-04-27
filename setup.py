@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'linguist',
-    version = '0.0.1',
-    keywords = ('linguist',),
+    version = '0.0.2',
+    keywords = ('linguist', 'detect', 'programming', 'language'),
     description = 'Language Savant',
     long_description = 'Language Savant',
     license = 'MIT License',
@@ -20,4 +20,5 @@ setup(
     platforms = 'any',
     install_requires = ['PyYAML', 'pygments>=1.6', 'charlockholmes'],
     classifiers = [],
+    scripts = ['bin/pylinguist'],
 )

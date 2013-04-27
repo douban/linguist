@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+import os
+import sys
+
+from linguist.libs.repository import Repository
+from linguist.libs.file_blob import FileBlob
+
+
+def detech_repo(path):
+    repo = Repository.from_directory(path)
+    for lang, size in sorted(repo.languages.items(), key=lambda d: d[1], reverse=True):
+        percentage = round((size / float(repo.size)) * 100, 1)
+        print '%s %s' % (str(percentage) + '%', lang.name)
+
+
+def detech_blob(path):
+    blob = FileBlob(path, os.getcwd())
+    if blob.is_text:
+        type = 'Text'
+    elif blob.is_image:
+        type = 'Image'
+    else:
+        type = 'Binary'
+
+    print '%s: %s lines (%s sloc)' % (blob.name, blob.loc, blob.sloc)
+    print '  type: %s' % type
+    print '  language: %s' % (blob.language and blob.language.name)
+
+    if blob.is_large:
+        print '  blob is too large to be shown'
+    if blob.is_generated:
+        print '  appears to be generated source code'
+    if blob.is_vendored:
+        print '  appears to be a vendored file'
+
+
+def detech(path):
+    if not os.path.exists(path):
+        print '%s does not exist.'
+        return
+
+    if os.path.isdir(path):
+        detech_repo(path)
+
+    elif os.path.isfile(path):
+        detech_blob(path)
+
+
+if __name__ == '__main__':
+    argv = sys.argv
+
+    path = os.getcwd() if len(argv) == 1 else argv[1]
+    detech(path)
