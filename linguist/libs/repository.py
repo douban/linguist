@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import re
 from collections import defaultdict
 from functools import partial
 
 from file_blob import FileBlob
 
-STARTS_WITH_DOT_REGEX = re.compile('\.[^/]')
 
 class Repository(object):
     """
@@ -50,7 +48,7 @@ class Repository(object):
     @staticmethod
     def get_files(base_path):
         for root, dirs, files in os.walk(base_path):
-            if STARTS_WITH_DOT_REGEX.search(root):
+            if root.startswith('.'):
                 continue
             for f in files:
                 if f.startswith('.'):
@@ -120,7 +118,7 @@ class Repository(object):
                 self.sizes[blob.language.group] += blob.size
 
         # Compute total size
-        self._size = reduce(lambda x, y: x+y[1], self.sizes.items(), 0)
+        self._size = reduce(lambda x, y: x + y[1], self.sizes.items(), 0)
 
         # Get primary language
         primary = sorted(self.sizes.items(), key=lambda t: t[1], reverse=True)

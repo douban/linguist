@@ -127,6 +127,9 @@ python run.py
 ```
 
 ## Changelog
+__v0.0.3 [2013-05-20]__
+* Bugfix: ignore dir if dir.startswith('.')
+
 __v0.0.2 [2013-04-25]__
 * Added script `pylinguist`
 * Disable detech unknown ext file
