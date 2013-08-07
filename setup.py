@@ -9,7 +9,7 @@ setup(
     keywords = ('linguist', 'detect', 'programming', 'language'),
     description = 'Language Savant',
     long_description = 'Language Savant',
-    license = 'MIT License',
+    license = 'New BSD',
 
     url = 'https://github.com/liluo/linguist',
     author = 'liluo',
