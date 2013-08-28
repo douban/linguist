@@ -3,6 +3,7 @@
 from os import stat
 from blob_helper import BlobHelper
 
+
 class FileBlob(BlobHelper):
     """
     A FileBlob is a wrapper around a File object to make it quack

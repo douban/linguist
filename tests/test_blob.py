@@ -18,6 +18,7 @@ colorize_without_wrapper = """<span class="k">module</span> <span class="nn">Foo
 <span class="k">end</span>
 """
 
+
 class TestFileBob(LinguistTestBase):
 
     def blob(self, name):
@@ -43,7 +44,7 @@ class TestFileBob(LinguistTestBase):
 
     def test_content_type(self):
         assert "application/pdf" == self.blob("Binary/foo.pdf").content_type
-        # assert "audio/ogg" == self.blob("Binary/foo.ogg").content_type
+        assert "audio/ogg" == self.blob("Binary/foo.ogg").content_type
         assert "image/png" == self.blob("Binary/foo.png").content_type
         assert "text/plain; charset=iso-8859-2" == self.blob("Text/README").content_type
 
@@ -79,7 +80,6 @@ class TestFileBob(LinguistTestBase):
         assert 2 == self.blob("Ruby/foo.rb").sloc
 
     def test_encoding(self):
-        # pass
         assert "ISO-8859-2" == self.blob("Text/README").encoding
         assert "ISO-8859-1" == self.blob("Text/dump.sql").encoding
         assert "UTF-8" == self.blob("Text/foo.txt").encoding
