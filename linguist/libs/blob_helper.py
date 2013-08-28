@@ -2,10 +2,10 @@
 
 import re
 import urllib
-import mimetypes
 from os.path import realpath, dirname, splitext, basename, join, islink
 
 import yaml
+import mime
 import charlockholmes
 from pygments import lexers
 from pygments import highlight
@@ -20,13 +20,6 @@ DIR = dirname(realpath(__file__))
 VENDOR_PATH = join(DIR, "vendor.yml")
 VENDORED_PATHS = yaml.load(open(VENDOR_PATH))
 VENDORED_REGEXP = re.compile('|'.join(VENDORED_PATHS))
-
-# TODO python mimetypes 很不全
-if not mimetypes.inited:
-    mimetypes.init()
-    mimetypes.add_type('application/x-ruby', '.rb')
-    mimetypes.add_type('application/x-python', '.py')
-    mimetypes.add_type('application/x-sh', '.sh')
 
 
 class BlobHelper(object):
@@ -52,10 +45,15 @@ class BlobHelper(object):
     def _mime_type(self):
         if hasattr(self, '__mime_type'):
             return self.__mime_type
-        _type, _encoding = mimetypes.guess_type(self.name)
-        self.__mime_encodeing = _encoding
-        self.__mime_type = _type
-        return _type
+        guesses = mime.Types.of(self.name)
+        mimetypes = [mt for mt in guesses if mt.is_ascii]
+        if mimetypes:
+            self.__mime_type = mimetypes[0]
+        elif guesses:
+            self.__mime_type = guesses[0]
+        else:
+            self.__mime_type = None
+        return self.__mime_type
 
     @property
     def mime_type(self):
@@ -69,7 +67,7 @@ class BlobHelper(object):
 
         Returns a mime type String.
         """
-        return self._mime_type or 'text/plain'
+        return self._mime_type.to_s if self._mime_type else 'text/plain'
 
     @property
     def is_binary_mime_type(self):
@@ -78,8 +76,7 @@ class BlobHelper(object):
 
         Return true or false
         """
-        self._mime_type
-        return bool(self.__mime_encodeing)
+        return self._mime_type.is_binary if self._mime_type else False
 
     @property
     def is_likely_binary(self):

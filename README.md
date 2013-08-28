@@ -127,6 +127,7 @@ python run.py
 ```
 
 ## Changelog
+
 __v0.0.3 [2013-05-20]__
 * Bugfix: ignore dir if dir.startswith('.')
 
