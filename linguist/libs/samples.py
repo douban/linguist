@@ -22,8 +22,8 @@ class Samples(object):
         return '<Samples>'
 
     @classmethod
-    def generate(self):
-        data = self.data()
+    def generate(cls):
+        data = cls.data()
         json.dump(data, open(PATH, 'w'), indent=2)
 
     @classmethod
