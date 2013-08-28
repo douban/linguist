@@ -2,7 +2,6 @@
 
 import re
 import urllib
-import mimetypes
 from os.path import realpath, dirname, splitext, basename, join, islink
 
 import yaml
@@ -21,13 +20,6 @@ DIR = dirname(realpath(__file__))
 VENDOR_PATH = join(DIR, "vendor.yml")
 VENDORED_PATHS = yaml.load(open(VENDOR_PATH))
 VENDORED_REGEXP = re.compile('|'.join(VENDORED_PATHS))
-
-# TODO python mimetypes 很不全
-if not mimetypes.inited:
-    mimetypes.init()
-    mimetypes.add_type('application/x-ruby', '.rb')
-    mimetypes.add_type('application/x-python', '.py')
-    mimetypes.add_type('application/x-sh', '.sh')
 
 
 class BlobHelper(object):
