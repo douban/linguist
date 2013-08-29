@@ -2,6 +2,8 @@
 import json
 from os import listdir
 from os.path import realpath, dirname, exists, join, splitext
+from collections import defaultdict
+
 from classifier import Classifier
 from md5 import MD5
 
@@ -12,6 +14,7 @@ DATA = {}
 
 if exists(PATH):
     DATA = json.load(open(PATH))
+
 
 class Samples(object):
     """
@@ -37,17 +40,16 @@ class Samples(object):
                     subdirname = join(dirname, filename)
                     for subfilename in listdir(subdirname):
                         func({'path': join(subdirname, subfilename),
-                                'language': category,
-                                'filename': subfilename})
+                              'language': category,
+                              'filename': subfilename})
                 else:
                     _extname = splitext(filename)[1]
-                    if _extname == '':
-                        raise '%s is missing an extension, maybe it belongs in filenames/subdir' % (join(dirname, filename))
                     path = join(dirname, filename)
-                    func({'path': join(dirname, filename),
-                            'language': category,
-                            'extname': _extname})
-
+                    if _extname == '':
+                        raise '%s is missing an extension, maybe it belongs in filenames/subdir' % path
+                    func({'path': path,
+                          'language': category,
+                          'extname': _extname})
 
     @classmethod
     def data(cls):
@@ -56,9 +58,8 @@ class Samples(object):
 
         Returns trained Classifier.
         """
-        db = {}
-        db['extnames'] = {}
-        db['filenames'] = {}
+        db = {'extnames': defaultdict(list),
+              'filenames': defaultdict(list)}
 
         def _learn(sample):
             _extname = sample.get('extname')
@@ -66,13 +67,11 @@ class Samples(object):
             _langname = sample['language']
 
             if _extname:
-                db['extnames'][_langname] = db['extnames'].get(_langname, [])
                 if _extname not in db['extnames'][_langname]:
                     db['extnames'][_langname].append(_extname)
                     db['extnames'][_langname].sort()
 
             if _filename:
-                db['filenames'][_langname] = db['filenames'].get(_langname, [])
                 db['filenames'][_langname].append(_filename)
                 db['filenames'][_langname].sort()
 
