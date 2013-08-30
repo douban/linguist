@@ -11,7 +11,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 
 from classifier import Classifier
-from samples import Samples, DATA
+from samples import DATA
 
 DIR = dirname(realpath(__file__))
 POPULAR_PATH = join(DIR, "popular.yml")
@@ -19,6 +19,12 @@ LANGUAGES_PATH = join(DIR, "languages.yml")
 
 POPULAR = yaml.load(open(POPULAR_PATH))
 LANGUAGES = yaml.load(open(LANGUAGES_PATH))
+
+
+class ItemMeta(type):
+    def __getitem__(cls, item):
+        return cls.find_by_name(item)
+
 
 class Language(object):
     """
@@ -28,10 +34,11 @@ class Language(object):
     Languages are defined in `lib/linguist/languages.yml`.
     """
 
-    languages       = []
-    index           = {}
-    name_index      = {}
-    alias_index     = {}
+    __metaclass__ = ItemMeta
+    languages = []
+    index = {}
+    name_index = {}
+    alias_index = {}
     extension_index = defaultdict(list)
     filename_index = defaultdict(list)
 
@@ -41,14 +48,20 @@ class Language(object):
     # Valid Languages types
     TYPES = ('data', 'markup', 'programming')
 
+    @staticmethod
+    def detectable_markup():
+        # Names of non-programming languages that we will still detect
+        # Returns an array
+        return ["CSS", "Less", "Sass"]
+
     @classmethod
     def create(cls, attributes={}):
         language = cls(attributes)
         cls.languages.append(language)
 
         # All Language names should be unique. Raise if there is a duplicate.
-        if cls.name_index.has_key(language.name):
-            raise ValueError, "Duplicate language name: %s" % language.name
+        if language.name in cls.name_index:
+            raise ValueError("Duplicate language name: %s" % language.name)
         # Language name index
         name = language.name
         cls.index[name] = cls.name_index[name] = language
@@ -57,36 +70,34 @@ class Language(object):
         # All Language aliases should be unique.
         # Raise if there is a duplicate.
         for name in language.aliases:
-            if cls.alias_index.has_key(name):
-                raise ValueError, "Duplicate alias: %s " % name
+            if name in cls.alias_index:
+                raise ValueError("Duplicate alias: %s " % name)
             cls.index[name] = cls.alias_index[name] = language
 
         for extension in language.extensions:
             if not extension.startswith('.'):
-                raise ValueError, "Extension is missing a '.': %s"%extension
+                raise ValueError("Extension is missing a '.': %s" % extension)
             cls.extension_index[extension].append(language)
 
         for filename in language.filenames:
             cls.filename_index[filename].append(language)
-
         return language
-
 
     def __init__(self, attributes={}):
         # name is required
-        if 'name' not in attributes.keys():
+        if 'name' not in attributes:
             raise KeyError('missing name')
         self.name = attributes['name']
 
         # Set type
         self.type = attributes.get('type')
         if self.type and self.type not in self.TYPES:
-            raise ValueError('invalid type: %s' %self.type)
+            raise ValueError('invalid type: %s' % self.type)
 
         self.color = attributes['color']
 
         # Set aliases
-        aliases = attributes.get('aliases') or []
+        aliases = attributes.get('aliases', [])
         self.aliases = [self.default_alias_name] + aliases
 
         # Lookup Lexer object
@@ -102,8 +113,8 @@ class Language(object):
         self.search_term = attributes.get('search_term') or self.default_alias_name
 
         # Set extensions or default to [].
-        self.extensions = attributes.get('extensions') or []
-        self.filenames = attributes.get('filenames') or []
+        self.extensions = attributes.get('extensions', [])
+        self.filenames = attributes.get('filenames', [])
 
         self.primary_extension = attributes.get('primary_extension')
         if not self.primary_extension:
@@ -114,8 +125,8 @@ class Language(object):
             self.extensions = [self.primary_extension] + self.extensions
 
         # Set popular, and searchable flags
-        self.popular = attributes['popular'] if attributes.has_key('popular') else False
-        self.searchable = attributes['searchable'] if attributes.has_key('searchable') else True
+        self.popular = attributes.get('popular', False)
+        self.searchable = attributes.get('searchable', True)
 
         # If group name is set, save the name so we can lazy load it later
         group_name = attributes.get('group_name')
@@ -160,7 +171,7 @@ class Language(object):
         Returns all matching Languages or [] if none were found.
         """
         name, extname = basename(filename), splitext(filename)[1]
-        return cls.filename_index.get(name,[]) + cls.extension_index.get(extname,[])
+        return cls.filename_index.get(name, []) + cls.extension_index.get(extname, [])
 
     @classmethod
     def find_by_alias(cls, name):
@@ -192,7 +203,6 @@ class Language(object):
         cls._ace_modes = sorted(filter(lambda l: l.ace_mode, cls.all()), key=lambda l: l.name.lower())
         return cls._ace_modes
 
-
     @classmethod
     def all(cls):
         """
@@ -200,7 +210,6 @@ class Language(object):
         Returns an Array of Languages
         """
         return cls.languages
-
 
     @classmethod
     def detect(cls, name, data, mode=None):
@@ -220,7 +229,7 @@ class Language(object):
         classified with other languages that have shebang scripts.
         """
         extname = splitext(name)[1]
-        if not extname and mode and (int(mode, 8)&05 == 05):
+        if not extname and mode and (int(mode, 8) & 05 == 05):
             name += ".script!"
 
         possible_languages = cls.find_by_filename(name)
@@ -276,7 +285,6 @@ class Language(object):
         """
         return self.searchable
 
-
     @property
     def default_alias_name(self):
         """
@@ -308,31 +316,25 @@ for name, options in LANGUAGES.items():
     options['filenames'] = options.get('filenames', [])
 
     def _merge(data, item_name):
-        items = data.get(name)
-        if not items:
-            return
-
+        items = data.get(name, [])
         for item in items:
-            if item in options[item_name]:
-                Warning('%s %s is already defined in samples/. Remove from languages.yml.' % (name, item))
-            else:
+            if item not in options[item_name]:
                 options[item_name].append(item)
+
     _merge(extensions, 'extensions')
     _merge(filenames, 'filenames')
 
-    Language.create(dict(
-        name=name,
-        color=options.get('color'),
-        type=options.get('type'),
-        aliases=options.get('aliases', []),
-        lexer=options.get('lexer'),
-        ace_mode=options.get('ace_mode'),
-        wrap=options.get('wrap'),
-        group_name=options.get('group'),
-        searchable=options.get('searchable', True),
-        search_term=options.get('search_term'),
-        extensions=sorted(options['extensions']),
-        primary_extension=options.get('primary_extension'),
-        filenames=options['filenames'],
-        popular=name in popular
-    ))
+    Language.create(dict(name=name,
+                         color=options.get('color'),
+                         type=options.get('type'),
+                         aliases=options.get('aliases', []),
+                         lexer=options.get('lexer'),
+                         ace_mode=options.get('ace_mode'),
+                         wrap=options.get('wrap'),
+                         group_name=options.get('group'),
+                         searchable=options.get('searchable', True),
+                         search_term=options.get('search_term'),
+                         extensions=sorted(options['extensions']),
+                         primary_extension=options.get('primary_extension'),
+                         filenames=options['filenames'],
+                         popular=name in popular))

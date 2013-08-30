@@ -100,9 +100,9 @@ Assembly:
   - nasm
   primary_extension: .asm
 
-# Augeas:
-#   type: programming
-#   primary_extension: .aug
+Augeas:
+  type: programming
+  primary_extension: .aug
 
 AutoHotkey:
   type: programming
@@ -346,14 +346,14 @@ Delphi:
   - .dfm
   - .lpr
 
-# DCPU-16 ASM:
-#   type: programming
-#   lexer: dasm16
-#   primary_extension: .dasm16
-#   extensions:
-#   - .dasm
-#   aliases:
-#   - dasm16
+DCPU-16 ASM:
+  type: programming
+  lexer: dasm16
+  primary_extension: .dasm16
+  extensions:
+  - .dasm
+  aliases:
+  - dasm16
 
 Diff:
   primary_extension: .diff
@@ -1234,10 +1234,10 @@ Shell:
   filenames:
   - Dockerfile
 
-# Slash:
-#   type: programming
-#   color: "#007eff"
-#   primary_extension: .sl
+Slash:
+  type: programming
+  color: "#007eff"
+  primary_extension: .sl
 
 Smalltalk:
   type: programming
@@ -1260,9 +1260,9 @@ SuperCollider:
   lexer: Text only
   primary_extension: .sc
 
-# TOML:
-#   type: data
-#   primary_extension: .toml
+TOML:
+  type: data
+  primary_extension: .toml
 
 TXL:
   type: programming
