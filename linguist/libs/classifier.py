@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import math
 from functools import partial
-from collections import Counter
+
+is_py27 = sys.version_info >= (2, 7)
+if is_py27:
+    from collections import Counter
 from tokenizer import Tokenizer
 
 
@@ -160,6 +164,9 @@ class Classifier(object):
 
         print '%ss' % maxlen
         print '    #' + ''.join(['%10s' for lang in languages])
+
+        if not is_py27:
+            return
 
         tokmap = Counter(tokens)
         for tok, count in tokmap.most_common():
