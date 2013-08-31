@@ -105,11 +105,14 @@ class Repository(object):
             return
 
         for blob in self.enum:
+            # Skip vendored
+            if blob.is_vendored:
+                continue
             # Skip files that are likely binary
             if blob.is_likely_binary:
                 continue
-            # Skip vendored or generated blobs
-            if blob.is_vendored or blob.is_generated or blob.language is None:
+            # Skip generated blobs
+            if blob.is_generated or blob.language is None:
                 continue
             # Only include programming languages and acceptable markup languages
             if blob.language.type == 'programming' or blob.language.name in Language.detectable_markup():

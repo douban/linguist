@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from re import compile, _pattern_type
 
-import re
 
 class StringScanner(object):
 
@@ -15,7 +15,7 @@ class StringScanner(object):
     @property
     def is_eos(self):
         """
-        Return true if the scan pointer is at the end of the string. 
+        Return true if the scan pointer is at the end of the string.
         """
         return self.pos >= len(self.string)
 
@@ -36,7 +36,7 @@ class StringScanner(object):
     @property
     def rest(self):
         """
-        Return true if the scan pointer is at the end of the string. 
+        Return true if the scan pointer is at the end of the string.
         """
         return self.string[self.pos:]
 
@@ -69,7 +69,7 @@ class StringScanner(object):
     def prev(self):
         # The last position of the scan pointer.
         return self.pos_history[-2]
-        
+
     @property
     def match(self):
         return self._match
@@ -99,7 +99,7 @@ class StringScanner(object):
     @property
     def post_match(self):
         """
-        Get whatever comes after the current match. 
+        Get whatever comes after the current match.
         """
         return self.string[self.match.end():]
 
@@ -115,7 +115,7 @@ class StringScanner(object):
 
     @property
     def is_beginning_of_line(self):
-        """ 
+        """
         Return true if the scan pointer is at the beginning of a line.
         """
         if self.pos > len(self.string):
@@ -127,7 +127,7 @@ class StringScanner(object):
     @property
     def terminate(self):
         """
-        Set the scan pointer to the end of the string; 
+        Set the scan pointer to the end of the string;
         clear match data.
         """
         self.pos = len(self.string)
@@ -169,7 +169,6 @@ class StringScanner(object):
             return self.string[start_pos:self.match.end()]
         return (self.match.end() - start_pos)
 
-
     def scan(self, regex):
         """
         Match a pattern from the current position.
@@ -191,7 +190,7 @@ class StringScanner(object):
 
     def scan_upto(self, regex):
         """
-        Scan up to, but not including, the given regex. 
+        Scan up to, but not including, the given regex.
         """
         pos = self.pos
         if self.scan_until(regex) is not None:
@@ -237,10 +236,10 @@ def text_coords(string, position):
     """
     Transform a simple index into a human-readable position in a string.
 
-    This function accepts a string and an index, and will return a triple 
-    of `(lineno, columnno, line)` representing the position through the 
-    text. 
-    
+    This function accepts a string and an index, and will return a triple
+    of `(lineno, columnno, line)` representing the position through the
+    text.
+
     It's useful for displaying a string index in a human-readable way.
     """
     line_start = string.rfind('\n', 0, position) + 1
@@ -256,7 +255,7 @@ def get_regex(regex):
     Ensure we have a compiled regular expression object.
     """
     if isinstance(regex, basestring):
-        return re.compile(regex)
-    elif not isinstance(regex, re._pattern_type):
+        return compile(regex)
+    elif not isinstance(regex, _pattern_type):
         raise TypeError("Invalid regex type: %r" % (regex,))
     return regex

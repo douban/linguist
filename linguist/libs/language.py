@@ -246,9 +246,8 @@ class Language(object):
 
         _pns = [p.name for p in possible_languages]
         result = Classifier.classify(DATA, data, _pns)
-        result = result and result[0][0]
         if result:
-            return cls.find_by_name(result)
+            return cls[result[0][0]]
 
     def colorize(self, text, options={}):
         return highlight(text, self.lexer(), HtmlFormatter(**options))
@@ -311,7 +310,7 @@ extensions = DATA['extnames']
 filenames = DATA['filenames']
 popular = POPULAR
 
-for name, options in LANGUAGES.items():
+for name, options in sorted(LANGUAGES.iteritems(), key=lambda k: k[0]):
     options['extensions'] = options.get('extensions', [])
     options['filenames'] = options.get('filenames', [])
 
