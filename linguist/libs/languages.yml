@@ -242,6 +242,7 @@ Clojure:
   primary_extension: .clj
   extensions:
   - .cljs
+  - .cljx
   filenames:
   - riemann.config
 
@@ -1008,6 +1009,7 @@ Perl:
   primary_extension: .pl
   extensions:
   - .PL
+  - .nqp
   - .perl
   - .ph
   - .plx
@@ -1428,6 +1430,7 @@ XML:
   - .wxi
   - .wxl
   - .wxs
+  - .x3d
   - .xaml
   - .xlf
   - .xliff
