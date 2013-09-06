@@ -2,7 +2,7 @@
 
 import re
 import urllib
-from os.path import realpath, dirname, splitext, basename, join, islink
+from os.path import realpath, dirname, splitext, basename, join
 
 import yaml
 import mime
@@ -24,6 +24,12 @@ VENDORED_REGEXP = re.compile('|'.join(VENDORED_PATHS))
 
 class BlobHelper(object):
     """
+    DEPRECATED Avoid mixing into Blob classes. Prefer functional interfaces
+    like `Language.detect` over `Blob#language`. Functions are much easier to
+    cache and compose.
+
+    Avoid adding additional bloat to this module.
+
     BlobHelper is a mixin for Blobish classes that respond to "name",
       "data" and "size" such as Grit::Blob.
     """
@@ -151,7 +157,7 @@ class BlobHelper(object):
 
         if self.data:
             self._detect_encoding = charlockholmes.detect(self.data)
-        return self._detect_encoding
+            return self._detect_encoding
 
     @property
     def is_image(self):
@@ -169,7 +175,7 @@ class BlobHelper(object):
 
         Return true or false
         """
-        return self.ext_name in ('.stl', '.obj')
+        return self.ext_name == '.stl'
 
     @property
     def is_pdf(self):
@@ -179,6 +185,15 @@ class BlobHelper(object):
         Return true or false
         """
         return self.ext_name == '.pdf'
+
+    @property
+    def is_csv(self):
+        """
+        Public: Is this blob a CSV file?
+
+        Return true or false
+        """
+        return self.is_text and self.ext_name == '.csv'
 
     @property
     def is_text(self):
@@ -240,10 +255,9 @@ class BlobHelper(object):
         """
         Public: Is the blob safe to colorize?
 
-        We use Pygments.rb for syntax highlighting blobs, which
-        has some quirks and also is essentially 'un-killable' via
-        normal timeout.  To workaround this we try to
-        carefully handling Pygments.rb anything it can't handle.
+        We use Pygments for syntax highlighting blobs. Pygments
+        can be too slow for very large blobs or for certain
+        corner-case blobs.
 
         Return true or false
         """
@@ -300,42 +314,10 @@ class BlobHelper(object):
         if hasattr(self, '_lines'):
             return self._lines
         if self.is_viewable and self.data:
-            self._lines = self.data.split(self.line_split_character, -1)
+            self._lines = re.split('\r\n|\r|\n', self.data)
         else:
             self._lines = []
         return self._lines
-
-    @property
-    def line_split_character(self):
-        """
-        Character used to split lines. This is almost always "\n" except when Mac
-        Format is detected in which case it's "\r".
-
-        Returns a split pattern string.
-        """
-        if hasattr(self, '_line_split_character'):
-            return self._line_split_character
-        if self.is_mac_format:
-            self._line_split_character = '\r'
-        else:
-            self._line_split_character = '\n'
-        return self._line_split_character
-
-    @property
-    def is_mac_format(self):
-        """
-        Public: Is the data in ** Mac Format **. This format uses \r (0x0d) characters
-        for line ends and does not include a \n (0x0a).
-
-        Returns true when mac format is detected.
-        """
-        if not self.is_viewable:
-            return
-
-        data = self.data[0:4096]
-        if '\r' in data:
-            pos = data.index('\r')
-            return data[pos + 1] != '\n'
 
     @property
     def is_generated(self):
@@ -359,41 +341,6 @@ class BlobHelper(object):
         return self._is_generated
 
     @property
-    def is_indexable(self):
-        """
-        Public: Should the blob be indexed for searching?
-
-        Excluded:
-          - Files over 0.1MB
-          - Non-text files
-          - Languages marked as not searchable
-          - Generated source files
-
-        Please add additional test coverage to
-        `test/test_blob.rb#test_indexable` if you make any changes.
-
-        Return true or false
-        """
-        if self.size > 100 * 1024:
-            return False
-        elif self.is_binary:
-            return False
-        elif self.ext_name == '.txt':
-            return True
-        elif self.language is None:
-            return False
-        elif not self.language.is_searchable:
-            return False
-        elif self.is_generated:
-            return False
-        else:
-            return False
-
-    @property
-    def is_link(self):
-        return islink(self.path)
-
-    @property
     def language(self):
         """
         Public: Detects the Language of the blob.
@@ -405,10 +352,11 @@ class BlobHelper(object):
         if hasattr(self, '_language'):
             return self._language
 
-        def data():
-            if self.is_binary_mime_type or self.is_binary:
-                return ''
-            return self.data
+        _data = getattr(self, '_data', False)
+        if _data and isinstance(_data, basestring):
+            data = _data
+        else:
+            data = lambda: '' if (self.is_binary_mime_type or self.is_binary) else self.data
         self._language = Language.detect(self.name, data, self.mode)
         return self._language
 
@@ -432,16 +380,3 @@ class BlobHelper(object):
         if not self.is_safe_to_colorize:
             return
         return highlight(self.data, self.lexer(), HtmlFormatter(**options))
-
-    def colorize_without_wrapper(self, options={}):
-        """
-        Public: Highlight syntax of blob without the outer highlight div
-        """
-        text = self.colorize(options)
-        if text:
-            ret = re.compile(r'<div class="highlight"><pre>(.*?)<\/pre>\s*<\/div>', re.DOTALL).match(text)
-            if ret:
-                ret = ret.group(1)
-        else:
-            ret = ''
-        return ret

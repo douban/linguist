@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 from collections import defaultdict
 from functools import partial
+from itertools import imap
 
 from file_blob import FileBlob
+from language import Language
 
 
 class Repository(object):
@@ -42,18 +45,19 @@ class Repository(object):
         Returns a Repository
         """
         blob = partial(FileBlob, base_path=base_path)
-        enum = map(blob, cls.get_files(base_path))
+        enum = imap(blob, cls.get_files(base_path))
         return cls(enum)
 
     @staticmethod
     def get_files(base_path):
-        for root, dirs, files in os.walk(base_path):
-            if root.startswith('.'):
+        join, isfile = os.path.join, os.path.isfile
+        for root, dirs, files in os.walk(base_path, topdown=False, followlinks=False):
+            if re.search('\/\.', root):
                 continue
             for f in files:
-                if f.startswith('.'):
-                    continue
-                yield os.path.join(root, f)
+                full_path = join(root, f)
+                if isfile(full_path):
+                    yield full_path
 
     @property
     def languages(self):
@@ -101,27 +105,24 @@ class Repository(object):
             return
 
         for blob in self.enum:
-            # Skip files that are link
-            if blob.is_link:
+            # Skip vendored
+            if blob.is_vendored:
                 continue
-
             # Skip files that are likely binary
             if blob.is_likely_binary:
                 continue
-
-            # Skip vendored or generated blobs
-            if blob.is_vendored or blob.is_generated or blob.language is None:
+            # Skip generated blobs
+            if blob.is_generated or blob.language is None:
                 continue
-
-            # Only include programming languages
-            if blob.language.type == 'programming':
+            # Only include programming languages and acceptable markup languages
+            if blob.language.type == 'programming' or blob.language.name in Language.detectable_markup():
                 self.sizes[blob.language.group] += blob.size
 
         # Compute total size
-        self._size = reduce(lambda x, y: x + y[1], self.sizes.items(), 0)
+        self._size = sum(self.sizes.itervalues())
 
         # Get primary language
-        primary = sorted(self.sizes.items(), key=lambda t: t[1], reverse=True)
+        primary = sorted(self.sizes.iteritems(), key=lambda t: t[1], reverse=True)
         if primary:
             self._language = primary[0][0]
 

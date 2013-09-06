@@ -63,11 +63,6 @@ class TestFileBob(LinguistTestBase):
 
     def test_lines(self):
         assert ["module Foo", "end", ""] == self.blob("Ruby/foo.rb").lines
-
-    def test_mac_format(self):
-        assert self.blob("Text/mac.txt").is_mac_format
-
-    def test_lines_mac_format(self):
         assert ["line 1", "line 2", ""] == self.blob("Text/mac.txt").lines
 
     def test_size(self):
@@ -87,11 +82,9 @@ class TestFileBob(LinguistTestBase):
 
     def test_binary(self):
         # Large blobs aren't loaded
-        # large_blob = blob("git.exe")
-        # large_blob.instance_eval do
-        #   def data; end
-        # end
-        # assert large_blob.binary
+        large_blob = self.blob("git.exe")
+        large_blob._data = None
+        assert large_blob.is_binary
 
         assert self.blob("Binary/git.deb").is_binary
         assert self.blob("Binary/git.exe").is_binary
@@ -133,6 +126,9 @@ class TestFileBob(LinguistTestBase):
         assert not self.blob("Binary/linguist.gem").is_viewable
         assert not self.blob("Binary/octocat.ai").is_viewable
         assert not self.blob("Binary/octocat.png").is_viewable
+
+    def test_csv(self):
+        assert self.blob("Text/cars.csv").is_csv
 
     def test_pdf(self):
         assert self.blob("Binary/foo.pdf").is_pdf
@@ -181,6 +177,16 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("JavaScript/intro.js").is_generated
         assert self.blob("JavaScript/classes.js").is_generated
 
+        # Protocol Buffer generated code
+        assert self.blob("C++/protocol-buffer.pb.h").is_generated
+        assert self.blob("C++/protocol-buffer.pb.cc").is_generated
+        assert self.blob("Java/ProtocolBuffer.java").is_generated
+        assert self.blob("Python/protocol_buffer_pb2.py").is_generated
+
+        # Minified CSS
+        assert not self.blob("CSS/bootstrap.css").is_generated
+        assert self.blob("CSS/bootstrap.min.css").is_generated
+
     def test_vendored(self):
         assert not self.blob("Text/README").is_vendored
         assert not self.blob("ext/extconf.rb").is_vendored
@@ -216,6 +222,22 @@ class TestFileBob(LinguistTestBase):
         assert  self.blob("public/javascripts/jquery-1.6.1.min.js").is_vendored
         assert not self.blob("public/javascripts/jquery.github.menu.js").is_vendored
 
+        # jQuery UI
+        assert self.blob("themes/ui-lightness/jquery-ui.css").is_vendored
+        assert self.blob("themes/ui-lightness/jquery-ui-1.8.22.custom.css").is_vendored
+        assert self.blob("themes/ui-lightness/jquery.ui.accordion.css").is_vendored
+        assert self.blob("ui/i18n/jquery.ui.datepicker-ar.js").is_vendored
+        assert self.blob("ui/i18n/jquery-ui-i18n.js").is_vendored
+        assert self.blob("ui/jquery.effects.blind.js").is_vendored
+        assert self.blob("ui/jquery-ui-1.8.22.custom.js").is_vendored
+        assert self.blob("ui/jquery-ui-1.8.22.custom.min.js").is_vendored
+        assert self.blob("ui/jquery-ui-1.8.22.js").is_vendored
+        assert self.blob("ui/jquery-ui-1.8.js").is_vendored
+        assert self.blob("ui/jquery-ui.min.js").is_vendored
+        assert self.blob("ui/jquery.ui.accordion.js").is_vendored
+        assert self.blob("ui/minified/jquery.effects.blind.min.js").is_vendored
+        assert self.blob("ui/minified/jquery.ui.accordion.min.js").is_vendored
+
         # MooTools
         assert  self.blob("public/javascripts/mootools-core-1.3.2-full-compat.js").is_vendored
         assert  self.blob("public/javascripts/mootools-core-1.3.2-full-compat-yc.js").is_vendored
@@ -230,10 +252,6 @@ class TestFileBob(LinguistTestBase):
         assert  self.blob("public/javascripts/yahoo-dom-event.js").is_vendored
         assert  self.blob("public/javascripts/yahoo-min.js").is_vendored
         assert  self.blob("public/javascripts/yuiloader-dom-event.js").is_vendored
-
-        # LESS
-        assert  self.blob("public/javascripts/less-1.1.0.js").is_vendored
-        assert  self.blob("public/javascripts/less-1.1.0.min.js").is_vendored
 
         # WYS editors
         assert  self.blob("public/javascripts/ckeditor.js").is_vendored
@@ -260,22 +278,18 @@ class TestFileBob(LinguistTestBase):
 
         # jQuery validation plugin (MS bundles this with asp.net mvc)
         assert  self.blob("Scripts/jquery.validate.js").is_vendored
+        assert  self.blob("Scripts/jquery.validate.min.js").is_vendored
+        assert  self.blob("Scripts/jquery.validate.unobtrusive.js").is_vendored
+        assert  self.blob("Scripts/jquery.validate.unobtrusive.min.js").is_vendored
+        assert  self.blob("Scripts/jquery.unobtrusive-ajax.js").is_vendored
+        assert  self.blob("Scripts/jquery.unobtrusive-ajax.min.js").is_vendored
 
         # NuGet Packages
         assert  self.blob("packages/Modernizr.2.0.6/Content/Scripts/modernizr-2.0.6-development-only.js").is_vendored
 
-    def test_indexable(self):
-        # assert self.blob("Ruby/foo.rb").is_indexable
-        assert not self.blob("Text/defu.nkt").is_indexable
-        assert not self.blob("Text/dump.sql").is_indexable
-        assert not self.blob("Binary/github.po").is_indexable
-        assert not self.blob("Binary/linguist.gem").is_indexable
-
-        # large binary blobs should fail on size check first, not call
-        # into charlock_holmes and alloc big buffers for testing encoding
-        # b = blob("Binary/octocat.ai")
-        # b.expects(:binary?).never
-        # assert !b.indexable?
+        # Test fixtures
+        assert self.blob("test/fixtures/random.rkt").is_vendored
+        assert self.blob("Test/fixtures/random.rkt").is_vendored
 
     def test_language(self):
         def _check_lang(sample):
@@ -290,9 +304,6 @@ class TestFileBob(LinguistTestBase):
 
     def test_colorize(self):
         assert colorize == self.blob("Ruby/foo.rb").colorize()
-
-    def test_colorize_without_wrapper(self):
-        assert colorize_without_wrapper == self.blob("Ruby/foo.rb").colorize_without_wrapper()
 
     def test_colorize_does_skip_minified_files(self):
         assert None == self.blob("JavaScript/jquery-1.6.1.min.js").colorize()

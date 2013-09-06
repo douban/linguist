@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re
+from re import compile, escape
 
 from strscan import StringScanner
 
@@ -16,28 +16,32 @@ BYTE_LIMIT = 100000
 
 # Start state on token, ignore anything till the next newline
 SINGLE_LINE_COMMENTS = [
-    '//', # C
-    '#',  # Python, Ruby
-    '%',  # Tex
+    '//',  # C
+    '#',   # Python, Ruby
+    '%',   # Tex
 ]
 
 # Start state on opening token, ignore anything until the closing
 # token is reached.
 MULTI_LINE_COMMENTS = [
-    ['/*', '*/'],    # C
-    ['<!--', '-->'], # XML
-    ['{-', '-}'],    # Haskell
-    ['(*', '*)'],    # Coq
-    ['"""', '"""'],  # Python
+    ['/*', '*/'],     # C
+    ['<!--', '-->'],  # XML
+    ['{-', '-}'],     # Haskell
+    ['(*', '*)'],     # Coq
+    ['"""', '"""'],   # Python
+    ["'''", "'''"],   # Python
 ]
 
-START_SINGLE_LINE_COMMENT = re.compile('|'.join(map(lambda c: '\s*%s ' % re.escape(c), SINGLE_LINE_COMMENTS)))
-START_MULTI_LINE_COMMENT = re.compile('|'.join(map(lambda c: re.escape(c[0]), MULTI_LINE_COMMENTS)))
+MULTI_LINE_COMMENT_DICT = dict(MULTI_LINE_COMMENTS)
+
+START_SINGLE_LINE_COMMENT = compile('|'.join(map(lambda c: '\s*%s ' % escape(c), SINGLE_LINE_COMMENTS)))
+START_MULTI_LINE_COMMENT = compile('|'.join(map(lambda c: escape(c[0]), MULTI_LINE_COMMENTS)))
+
 
 class Tokenizer(object):
 
     def __repr__(self):
-        return '<tokenizer>'
+        return '<Tokenizer>'
 
     @classmethod
     def tokenize(cls, data):
@@ -49,7 +53,6 @@ class Tokenizer(object):
         Returns Array of token Strings.
         """
         return cls().extract_tokens(data)
-
 
     def extract_tokens(self, data):
         """
@@ -67,7 +70,8 @@ class Tokenizer(object):
         s = StringScanner(data)
         tokens = []
         while not s.is_eos:
-            if s.pos >= BYTE_LIMIT: break
+            if s.pos >= BYTE_LIMIT:
+                break
             token = s.scan(r'^#!.+')
             if token:
                 name = self.extract_shebang(token)
@@ -83,8 +87,8 @@ class Tokenizer(object):
             # Multiline comments
             token = s.scan(START_MULTI_LINE_COMMENT)
             if token:
-                close_token = dict(MULTI_LINE_COMMENTS).get(token)
-                s.skip_until(re.compile(re.escape(close_token)))
+                close_token = MULTI_LINE_COMMENT_DICT[token]
+                s.skip_until(compile(escape(close_token)))
                 continue
 
             # Skip single or double quoted strings
@@ -131,7 +135,6 @@ class Tokenizer(object):
             s.getch
         return tokens
 
-
     @classmethod
     def extract_shebang(cls, data):
         """
@@ -155,7 +158,7 @@ class Tokenizer(object):
                 s.scan(r'\s+')
                 script = s.scan(r'\S+')
             if script:
-                script = re.compile(r'[^\d]+').match(script).group(0)
+                script = compile(r'[^\d]+').match(script).group(0)
             return script
         return
 
@@ -174,18 +177,19 @@ class Tokenizer(object):
         """
         s = StringScanner(data)
         tokens = []
+        append = tokens.append
 
         while not s.is_eos:
             # Emit start token
             token = s.scan(r'<\/?[^\s>]+')
             if token:
-                tokens.append(token + '>')
+                append(token + '>')
                 continue
 
             # Emit attributes with trailing =
             token = s.scan(r'\w+=')
             if token:
-                tokens.append(token)
+                append(token)
 
                 # Then skip over attribute value
                 if s.scan('"'):
@@ -200,7 +204,7 @@ class Tokenizer(object):
             # Emit lone attributes
             token = s.scan(r'\w+')
             if token:
-                tokens.append(token)
+                append(token)
 
             # Stop at the end of the tag
             if s.scan('>'):

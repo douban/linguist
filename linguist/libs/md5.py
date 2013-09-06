@@ -2,6 +2,7 @@
 
 import hashlib
 
+
 class MD5(object):
 
     def __repr__(self):
@@ -31,6 +32,6 @@ class MD5(object):
                 digest.update(e)
 
         else:
-            raise TypeError, "can't convert %s into String" % obj
+            raise TypeError("can't convert %s into String" % obj)
 
         return digest.hexdigest()

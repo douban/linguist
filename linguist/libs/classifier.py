@@ -1,16 +1,26 @@
 # -*- coding: utf-8 -*-
+import os
+import sys
 import math
 from functools import partial
 
+is_py27 = sys.version_info >= (2, 7)
+if is_py27:
+    from collections import Counter
 from tokenizer import Tokenizer
+
 
 class Classifier(object):
     """ Language bayesian classifier. """
 
+    verbosity = int(os.environ.get('LINGUIST_DEBUG', '0'))
 
     @classmethod
     def train(cls, db, language, data):
         """
+        Set LINGUIST_DEBUG=1 or =2 to see probabilities per-token,
+        per-language.  See also dump_all_tokens, below.
+
         Public: Train classifier that data is a certain language.
 
           db       - Hash classifier database object
@@ -42,11 +52,10 @@ class Classifier(object):
         db['languages'][language] += 1
         db['languages_total'] += 1
 
-
     def __init__(self, db={}):
-        self.tokens          = db.get('tokens')
-        self.tokens_total    = db.get('tokens_total')
-        self.languages       = db.get('languages')
+        self.tokens = db.get('tokens')
+        self.tokens_total = db.get('tokens_total')
+        self.languages = db.get('languages')
         self.languages_total = db.get('languages_total')
         self.language_tokens = db.get('language_tokens')
 
@@ -86,15 +95,20 @@ class Classifier(object):
         if tokens is None:
             return []
 
-        if isinstance(tokens, str):
+        if isinstance(tokens, basestring):
             tokens = Tokenizer.tokenize(tokens)
 
         scores = {}
+        if self.verbosity >= 2:
+            self.dump_all_tokens(tokens, languages)
         for language in languages:
-            scores[language] = self.tokens_probability(tokens, language) + \
-                    self.language_probability(language)
-
-        return sorted(scores.items(), key=lambda t: t[1], reverse=True)
+            scores[language] = self.tokens_probability(tokens, language) + self.language_probability(language)
+            if self.verbosity >= 1:
+                print '%10s = %10.3f + %7.3f = %10.3f\n' % (language,
+                                                            self.tokens_probability(tokens, language),
+                                                            self.language_probability(language),
+                                                            scores[language])
+        return sorted(scores.iteritems(), key=lambda t: t[1], reverse=True)
 
     def tokens_probability(self, tokens, language):
         """
@@ -106,8 +120,7 @@ class Classifier(object):
         Returns Float between 0.0 and 1.0.
         """
         token_probability = partial(self.token_probability, language=language)
-        return reduce(lambda x, y: x+ math.log(token_probability(y)), tokens, 0.0)
-
+        return reduce(lambda x, y: x + math.log(token_probability(y)), tokens, 0.0)
 
     def token_probability(self, token, language=''):
         """
@@ -133,3 +146,39 @@ class Classifier(object):
         Returns Float between 0.0 and 1.0.
         """
         return math.log(float(self.languages[language]) / float(self.languages_total))
+
+    def dump_all_tokens(self, tokens, languages):
+        """
+        Internal: show a table of probabilities for each <token,language> pair.
+
+        The number in each table entry is the number of "points" that each
+        token contributes toward the belief that the file under test is a
+        particular language.  Points are additive.
+
+        Points are the number of times a token appears in the file, times
+        how much more likely (log of probability ratio) that token is to
+        appear in one language vs.  the least-likely language.  Dashes
+        indicate the least-likely language (and zero points) for each token.
+        """
+        maxlen = max([len(token) for token in tokens])
+
+        print '%ss' % maxlen
+        print '    #' + ''.join(['%10s' for lang in languages])
+
+        if not is_py27:
+            return
+
+        tokmap = Counter(tokens)
+        for tok, count in tokmap.most_common():
+            arr = [(lang, self.token_probability(tok, lang)) for lang in languages]
+            minlen = min([n for lang, n in arr])
+            minlog = math.log(minlen)
+
+            if not reduce(lambda x, y: x and y[1] == arr[0][1], arr, True):
+                print '%*s%5d' % (maxlen, tok, count)
+
+                for ent in arr:
+                    if ent[1] == minlen:
+                        print '         -'
+                    else:
+                        print '%10.3f' % (math.log(ent[1]) - minlog)

@@ -9,6 +9,7 @@ python:
 install:
   - "pip install PyYAML"
   - "pip install pygments>=1.6"
+  - "pip install pygments-github-lexers>=0.01"
   - "pip install charlockholmes"
   - "pip install mime>=0.02"
 

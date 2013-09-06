@@ -11,7 +11,7 @@ class Generated(object):
 
     def __init__(self, name, data):
         self.name = name
-        self.ext_name = splitext(self.name)[1]
+        self.ext_name = splitext(self.name)[1].lower()
         self._data = data
 
     def __repr__(self):
@@ -35,12 +35,13 @@ class Generated(object):
     @property
     def _is_generated(self):
         return self.name == "Gemfile.lock" \
-                    or self.is_minified_javascript \
-                    or self.is_compiled_coffeescript \
-                    or self.is_xcode_project_file \
-                    or self.is_generated_net_docfile \
-                    or self.is_generated_parser \
-                    or self.is_generated_protocol_buffer
+                            or self.is_minified_files \
+                            or self.is_compiled_coffeescript \
+                            or self.is_xcode_project_file \
+                            or self.is_generated_parser \
+                            or self.is_generated_net_docfile \
+                            or self.is_generated_net_designer_file \
+                            or self.is_generated_protocol_buffer
 
     @property
     def is_xcode_project_file(self):
@@ -55,22 +56,20 @@ class Generated(object):
         return self.ext_name in XCODE_PROJECT_EXT_NAMES
 
     @property
-    def is_minified_javascript(self):
+    def is_minified_files(self):
         """
-        Internal: Is the blob minified JS?
+        Internal: Is the blob minified files?
 
-        Consider JS minified if the average line length is
-        greater then 100c.
+        Consider a file minified if it contains more than 5% spaces.
+        Currently, only JS and CSS files are detected by this method.
 
         Returns True or False.
         """
-        if self.ext_name != '.js':
+        if self.ext_name not in ('.js', '.css'):
             return False
-
-        lines = self.lines
-        if lines:
-            return reduce(lambda x,y: x+len(y), lines, 0) / len(lines) > 100
-
+        if self.data and len(self.data) > 200:
+            count_space = sum([1 for _ in self.data if _ <= ' '])
+            return (count_space / float(len(self.data))) < 0.05
         return False
 
     @property
@@ -105,17 +104,13 @@ class Generated(object):
             # Second to last line closes module closure
             # Last line is blank
             score = 0
-
             count_keys = lambda r, s: len(re.compile(r, re.DOTALL).findall(s))
-
             for line in lines:
                 if re.compile('var ', re.DOTALL).search(line):
                     # Underscored temp vars are likely to be Coffee
                     score += 1 * count_keys('(_fn|_i|_len|_ref|_results)', line)
-
                     # bind and extend functions are very Coffee specific
                     score += 3 * count_keys('(__bind|__extends|__hasProp|__indexOf|__slice)', line)
-
             return score > 3
         return False
 
@@ -132,19 +127,34 @@ class Generated(object):
         Returns True or False
           return false unless extname.downcase == ".xml"
           return false unless lines.count > 3
-
-        .NET Docfiles always open with <doc> and their first tag is an
-        <assembly> tag
         """
+        if self.ext_name != ".xml":
+            return False
 
         lines = self.lines
 
-        if len(lines) < 5:
+        if len(lines) < 3:
             return False
 
+        """
+        .NET Docfiles always open with <doc> and their first tag is an
+        <assembly> tag
+        """
         return '<doc>' in lines[1] \
-                    and '<assembly>' in lines[2] \
-                    and '</doc>' in lines[-2]
+               and '<assembly>' in lines[2] \
+               and '</doc>' in lines[-2]
+
+    @property
+    def is_generated_net_designer_file(self):
+        """
+        Internal: Is this a codegen file for a .NET project?
+
+        Visual Studio often uses code generation to generate partial
+        classes, and these files can be quite unwieldy. Let's hide them.
+
+        Returns true or false
+        """
+        return self.name.lower().endswith('.designer.cs')
 
     @property
     def is_generated_parser(self):
