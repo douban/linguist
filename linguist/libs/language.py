@@ -41,6 +41,7 @@ class Language(object):
     alias_index = {}
     extension_index = defaultdict(list)
     filename_index = defaultdict(list)
+    primary_extension_index = {}
 
     _colors = []
     _ace_modes = []
@@ -52,7 +53,7 @@ class Language(object):
     def detectable_markup():
         # Names of non-programming languages that we will still detect
         # Returns an array
-        return ["CSS", "Less", "Sass"]
+        return ["CSS", "Less", "Sass", "TeX"]
 
     @classmethod
     def create(cls, attributes={}):
@@ -78,6 +79,10 @@ class Language(object):
             if not extension.startswith('.'):
                 raise ValueError("Extension is missing a '.': %s" % extension)
             cls.extension_index[extension].append(language)
+
+        if language.primary_extension in cls.primary_extension_index:
+            raise ValueError("Duplicate primary extension: %s" % language.primary_extension)
+        cls.primary_extension_index[language.primary_extension] = language
 
         for filename in language.filenames:
             cls.filename_index[filename].append(language)
@@ -171,7 +176,10 @@ class Language(object):
         Returns all matching Languages or [] if none were found.
         """
         name, extname = basename(filename), splitext(filename)[1]
-        return cls.filename_index.get(name, []) + cls.extension_index.get(extname, [])
+        langs = [cls.primary_extension_index.get(extname, None)]
+        langs.extend(cls.filename_index.get(name, []))
+        langs.extend(cls.extension_index.get(extname, []))
+        return list(set(langs))
 
     @classmethod
     def find_by_alias(cls, name):
