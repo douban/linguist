@@ -77,7 +77,7 @@ class Tokenizer(object):
                 name = self.extract_shebang(token)
                 if name:
                     tokens.append('SHEBANG#!%s' % name)
-                    continue
+                continue
 
             # Single line comment
             if s.is_beginning_of_line and s.scan(START_SINGLE_LINE_COMMENT):
@@ -97,11 +97,13 @@ class Tokenizer(object):
                     s.getch
                 else:
                     s.skip_until(r'[^\\]"')
+                continue
             if s.scan(r"'"):
                 if s.peek(1) == "'":
                     s.getch
                 else:
                     s.skip_until(r"[^\\]'")
+                continue
 
             # Skip number literals
             if s.scan(r'(0x)?\d(\d|\.)*'):
