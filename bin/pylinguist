@@ -6,7 +6,7 @@ from linguist.libs.repository import Repository
 from linguist.libs.file_blob import FileBlob
 
 """
-linguist — detect language type for a file, or, given a directory, determine language breakdown
+linguist - detect language type for a file, or, given a directory, determine language breakdown
 
 usage: pylinguist <path>
 """
