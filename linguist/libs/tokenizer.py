@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from re import compile, escape
 
-from strscan import StringScanner
+from scanner import StringScanner, StringRegexp
 
 """
 Generic programming language tokenizer.
@@ -24,18 +24,40 @@ SINGLE_LINE_COMMENTS = [
 # Start state on opening token, ignore anything until the closing
 # token is reached.
 MULTI_LINE_COMMENTS = [
-    ['/*', '*/'],     # C
-    ['<!--', '-->'],  # XML
-    ['{-', '-}'],     # Haskell
-    ['(*', '*)'],     # Coq
-    ['"""', '"""'],   # Python
-    ["'''", "'''"],   # Python
+    [r'/*', r'*/'],     # C
+    [r'<!--', r'-->'],  # XML
+    [r'{-', r'-}'],     # Haskell
+    [r'(*', r'*)'],     # Coq
+    [r'"""', r'"""'],   # Python
+    [r"'''", r"'''"],   # Python
 ]
 
-MULTI_LINE_COMMENT_DICT = dict(MULTI_LINE_COMMENTS)
+MULTI_LINE_COMMENT_DICT = dict([(s, StringRegexp(escape(e)))
+                                for s, e in MULTI_LINE_COMMENTS])
 
-START_SINGLE_LINE_COMMENT = compile('|'.join(map(lambda c: '\s*%s ' % escape(c), SINGLE_LINE_COMMENTS)))
-START_MULTI_LINE_COMMENT = compile('|'.join(map(lambda c: escape(c[0]), MULTI_LINE_COMMENTS)))
+START_SINGLE_LINE_COMMENT = StringRegexp('|'.join(map(lambda c: '\s*%s ' % escape(c), SINGLE_LINE_COMMENTS)))
+START_MULTI_LINE_COMMENT = StringRegexp('|'.join(map(lambda c: escape(c[0]), MULTI_LINE_COMMENTS)))
+
+
+REGEX_SHEBANG = StringRegexp(r'^#!.+')
+REGEX_BOL = StringRegexp(r'\n|\Z')
+REGEX_DOUBLE_QUOTE = StringRegexp(r'"')
+REGEX_SINGLE_QUOTE = StringRegexp(r"'")
+REGEX_DOUBLE_END_QUOTE = StringRegexp(r'[^\\]"')
+REGEX_SINGLE_END_QUOTE = StringRegexp(r"[^\\]'")
+REGEX_NUMBER_LITERALS = StringRegexp(r'(0x)?\d(\d|\.)*')
+REGEX_SGML = StringRegexp(r'<[^\s<>][^<>]*>')
+REGEX_COMMON_PUNCTUATION = StringRegexp(r';|\{|\}|\(|\)|\[|\]')
+REGEX_REGULAR_TOKEN = StringRegexp(r'[\w\.@#\/\*]+')
+REGEX_COMMON_OPERATORS = StringRegexp(r'<<?|\+|\-|\*|\/|%|&&?|\|\|?')
+REGEX_EMIT_START_TOKEN = StringRegexp(r'<\/?[^\s>]+')
+REGEX_EMIT_TRAILING = StringRegexp(r'\w+=')
+REGEX_EMIT_WORD = StringRegexp(r'\w+')
+REGEX_EMIT_END_TAG = StringRegexp('>')
+
+REGEX_SHEBANG_FULL = StringRegexp(r'^#!\s*\S+')
+REGEX_SHEBANG_WHITESPACE = StringRegexp(r'\s+')
+REGEX_SHEBANG_NON_WHITESPACE = StringRegexp(r'\S+')
 
 
 class Tokenizer(object):
@@ -72,7 +94,7 @@ class Tokenizer(object):
         while not s.is_eos:
             if s.pos >= BYTE_LIMIT:
                 break
-            token = s.scan(r'^#!.+')
+            token = s.scan(REGEX_SHEBANG)
             if token:
                 name = self.extract_shebang(token)
                 if name:
@@ -80,56 +102,56 @@ class Tokenizer(object):
                 continue
 
             # Single line comment
-            if s.is_beginning_of_line and s.scan(START_SINGLE_LINE_COMMENT):
-                s.skip_until(r'\n|\Z')
+            if s.is_bol and s.scan(START_SINGLE_LINE_COMMENT):
+                s.skip_until(REGEX_BOL)
                 continue
 
             # Multiline comments
             token = s.scan(START_MULTI_LINE_COMMENT)
             if token:
                 close_token = MULTI_LINE_COMMENT_DICT[token]
-                s.skip_until(compile(escape(close_token)))
+                s.skip_until(close_token)
                 continue
 
             # Skip single or double quoted strings
-            if s.scan(r'"'):
+            if s.scan(REGEX_DOUBLE_QUOTE):
                 if s.peek(1) == '"':
                     s.getch
                 else:
-                    s.skip_until(r'[^\\]"')
+                    s.skip_until(REGEX_DOUBLE_END_QUOTE)
                 continue
-            if s.scan(r"'"):
+            if s.scan(REGEX_SINGLE_QUOTE):
                 if s.peek(1) == "'":
                     s.getch
                 else:
-                    s.skip_until(r"[^\\]'")
+                    s.skip_until(REGEX_SINGLE_END_QUOTE)
                 continue
 
             # Skip number literals
-            if s.scan(r'(0x)?\d(\d|\.)*'):
+            if s.scan(REGEX_NUMBER_LITERALS):
                 continue
 
             # SGML style brackets
-            token = s.scan(r'<[^\s<>][^<>]*>')
+            token = s.scan(REGEX_SGML)
             if token:
                 for t in self.extract_sgml_tokens(token):
                     tokens.append(t)
                 continue
 
             # Common programming punctuation
-            token = s.scan(r';|\{|\}|\(|\)|\[|\]')
+            token = s.scan(REGEX_COMMON_PUNCTUATION)
             if token:
                 tokens.append(token)
                 continue
 
             # Regular token
-            token = s.scan(r'[\w\.@#\/\*]+')
+            token = s.scan(REGEX_REGULAR_TOKEN)
             if token:
                 tokens.append(token)
                 continue
 
             # Common operators
-            token = s.scan(r'<<?|\+|\-|\*|\/|%|&&?|\|\|?')
+            token = s.scan(REGEX_COMMON_OPERATORS)
             if token:
                 tokens.append(token)
                 continue
@@ -153,12 +175,12 @@ class Tokenizer(object):
         Returns String token or nil it couldn't be parsed.
         """
         s = StringScanner(data)
-        path = s.scan(r'^#!\s*\S+')
+        path = s.scan(REGEX_SHEBANG_FULL)
         if path:
             script = path.split('/')[-1]
             if script == 'env':
-                s.scan(r'\s+')
-                script = s.scan(r'\S+')
+                s.scan(REGEX_SHEBANG_WHITESPACE)
+                script = s.scan(REGEX_SHEBANG_NON_WHITESPACE)
             if script:
                 script = compile(r'[^\d]+').match(script).group(0)
             return script
@@ -183,33 +205,33 @@ class Tokenizer(object):
 
         while not s.is_eos:
             # Emit start token
-            token = s.scan(r'<\/?[^\s>]+')
+            token = s.scan(REGEX_EMIT_START_TOKEN)
             if token:
                 append(token + '>')
                 continue
 
             # Emit attributes with trailing =
-            token = s.scan(r'\w+=')
+            token = s.scan(REGEX_EMIT_TRAILING)
             if token:
                 append(token)
 
                 # Then skip over attribute value
-                if s.scan('"'):
-                    s.skip_until(r'[^\\]"')
+                if s.scan(REGEX_DOUBLE_QUOTE):
+                    s.skip_until(REGEX_DOUBLE_END_QUOTE)
                     continue
-                if s.scan("'"):
-                    s.skip_until(r"[^\\]'")
+                if s.scan(REGEX_SINGLE_QUOTE):
+                    s.skip_until(REGEX_SINGLE_END_QUOTE)
                     continue
-                s.skip_until(r'\w+')
+                s.skip_until(REGEX_EMIT_WORD)
                 continue
 
             # Emit lone attributes
-            token = s.scan(r'\w+')
+            token = s.scan(REGEX_EMIT_WORD)
             if token:
                 append(token)
 
             # Stop at the end of the tag
-            if s.scan('>'):
+            if s.scan(REGEX_EMIT_END_TAG):
                 s.terminate
                 continue
 
