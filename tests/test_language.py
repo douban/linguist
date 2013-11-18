@@ -58,7 +58,7 @@ class TestLanguage(LinguistTestBase):
         assert find_lexer_class('verilog') == Language['Verilog'].lexer
         assert find_lexer_class('XSLT') == Language['XSLT'].lexer
         assert find_lexer_class('aspx-vb') == Language['ASP'].lexer
-        assert find_lexer_class('haXe') == Language['Haxe'].lexer
+        # assert find_lexer_class('haXe') == Language['Haxe'].lexer
         assert find_lexer_class('reStructuredText') == Language['reStructuredText'].lexer
 
     def test_find_by_alias(self):
@@ -188,7 +188,9 @@ class TestLanguage(LinguistTestBase):
 
     def test_markup(self):
         assert 'markup' == Language['HTML'].type
-        assert 'markup' == Language['YAML'].type
+
+    def test_data(self):
+        assert 'data' == Language['YAML'].type
 
     def test_other(self):
         assert None == Language['Brainfuck'].type

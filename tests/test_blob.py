@@ -183,6 +183,9 @@ class TestFileBob(LinguistTestBase):
         assert self.blob("Java/ProtocolBuffer.java").is_generated
         assert self.blob("Python/protocol_buffer_pb2.py").is_generated
 
+        # Generated JNI
+        assert self.blob("C/jni_layer.h").is_generated
+
         # Minified CSS
         assert not self.blob("CSS/bootstrap.css").is_generated
         assert self.blob("CSS/bootstrap.min.css").is_generated
@@ -191,11 +194,17 @@ class TestFileBob(LinguistTestBase):
         assert not self.blob("Text/README").is_vendored
         assert not self.blob("ext/extconf.rb").is_vendored
 
+        # Dependencies
+        assert self.blob("dependencies/windows/headers/GL/glext.h").is_vendored
+
         # Node depedencies
         assert  self.blob("node_modules/coffee-script/lib/coffee-script.js").is_vendored
 
         # Rails vendor/
         assert  self.blob("vendor/plugins/will_paginate/lib/will_paginate.rb").is_vendored
+
+        # 'thirdparty' directory
+        assert self.blob("thirdparty/lib/main.c").is_vendored
 
         # C deps
         assert  self.blob("deps/http_parser/http_parser.c").is_vendored
@@ -220,6 +229,8 @@ class TestFileBob(LinguistTestBase):
         assert  self.blob("public/javascripts/jquery-1.5.2.js").is_vendored
         assert  self.blob("public/javascripts/jquery-1.6.1.js").is_vendored
         assert  self.blob("public/javascripts/jquery-1.6.1.min.js").is_vendored
+        assert  self.blob("public/javascripts/jquery-1.10.1.js").is_vendored
+        assert  self.blob("public/javascripts/jquery-1.10.1.min.js").is_vendored
         assert not self.blob("public/javascripts/jquery.github.menu.js").is_vendored
 
         # jQuery UI
@@ -290,6 +301,15 @@ class TestFileBob(LinguistTestBase):
         # Test fixtures
         assert self.blob("test/fixtures/random.rkt").is_vendored
         assert self.blob("Test/fixtures/random.rkt").is_vendored
+
+        # Cordova/PhoneGap
+        assert self.blob("cordova.js").is_vendored
+        assert self.blob("cordova.min.js").is_vendored
+        assert self.blob("cordova-2.1.0.js").is_vendored
+        assert self.blob("cordova-2.1.0.min.js").is_vendored
+
+        # Vagrant
+        assert self.blob("Vagrantfile").is_vendored
 
     def test_language(self):
         def _check_lang(sample):
