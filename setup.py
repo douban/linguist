@@ -22,6 +22,6 @@ setup(name='linguist',
                         'pygments-github-lexers>=0.0.3',
                         'charlockholmes',
                         'mime>=0.0.3',
-                        'scanner>=0.0.2'],
+                        'scanner>=0.0.3'],
       classifiers=[],
       scripts=['bin/pylinguist'])
