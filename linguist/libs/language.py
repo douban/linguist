@@ -176,7 +176,9 @@ class Language(object):
         Returns all matching Languages or [] if none were found.
         """
         name, extname = basename(filename), splitext(filename)[1]
-        langs = [cls.primary_extension_index.get(extname, None)]
+
+        lang = cls.primary_extension_index.get(extname)
+        langs = lang and [lang] or []
         langs.extend(cls.filename_index.get(name, []))
         langs.extend(cls.extension_index.get(extname, []))
         return list(set(langs))

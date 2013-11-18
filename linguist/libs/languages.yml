@@ -687,6 +687,8 @@ Haxe:
   ace_mode: haxe
   color: "#346d51"
   primary_extension: .hx
+  aliases:
+  - haXe
   extensions:
   - .hxsl
 
