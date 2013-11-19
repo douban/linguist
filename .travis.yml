@@ -12,6 +12,7 @@ install:
   - "pip install pygments-github-lexers>=0.0.3"
   - "pip install charlockholmes"
   - "pip install mime>=0.0.3"
+  - "pip install scanner>=0.0.4"
 
 branches:
   only:

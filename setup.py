@@ -21,6 +21,7 @@ setup(name='linguist',
       install_requires=['PyYAML',
                         'pygments-github-lexers>=0.0.3',
                         'charlockholmes',
-                        'mime>=0.0.3'],
+                        'mime>=0.0.3',
+                        'scanner>=0.0.4'],
       classifiers=[],
       scripts=['bin/pylinguist'])
