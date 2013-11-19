@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 
 setup(name='linguist',
-      version='0.0.3',
+      version='0.1.0',
       keywords=('linguist', 'detect', 'programming', 'language'),
       description='Language Savant',
       long_description='Language Savant',
@@ -17,10 +17,11 @@ setup(name='linguist',
       packages=find_packages(),
       include_package_data=True,
       platforms='any',
+      dependency_links = ['https://github.com/liluo/pygments/tarball/master#egg=Pygments-1.6'],
       install_requires=['PyYAML',
-                        'pygments>=1.6',
-                        'pygments-github-lexers>=0.01',
+                        'pygments-github-lexers>=0.0.3',
                         'charlockholmes',
-                        'mime>=0.02'],
+                        'mime>=0.0.3',
+                        'scanner>=0.0.4'],
       classifiers=[],
       scripts=['bin/pylinguist'])
