@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 
 setup(name='linguist',
-      version='0.0.3',
+      version='0.1.0',
       keywords=('linguist', 'detect', 'programming', 'language'),
       description='Language Savant',
       long_description='Language Savant',
