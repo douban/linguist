@@ -128,6 +128,12 @@ python run.py
 
 ## Changelog
 
+__v0.1.0 [2013-11-19]__
+* Better performance, create && require scanner
+* Sync the latest version of github/linguist
+* Using MIME Types, create && require mime
+* Compatible github custom lexers, create && require pygments-github-lexers
+
 __v0.0.3 [2013-05-20]__
 * Bugfix: ignore dir if dir.startswith('.')
 
