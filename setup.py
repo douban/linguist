@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
+from linguist import VERSION
+
 
 setup(name='linguist',
-      version='0.1.0',
+      version=VERSION,
       keywords=('linguist', 'detect', 'programming', 'language'),
       description='Language Savant',
       long_description='Language Savant',
@@ -17,7 +19,7 @@ setup(name='linguist',
       packages=find_packages(),
       include_package_data=True,
       platforms='any',
-      dependency_links = ['https://github.com/liluo/pygments/tarball/master#egg=Pygments-1.6'],
+      dependency_links = ['https://github.com/liluo/pygments-main/tarball/master'],
       install_requires=['PyYAML',
                         'pygments-github-lexers>=0.0.3',
                         'charlockholmes',

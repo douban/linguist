@@ -128,6 +128,9 @@ python run.py
 
 ## Changelog
 
+__v0.1.1 [2014-11-03]__
+* Updated require Pygments
+
 __v0.1.0 [2013-11-19]__
 * Better performance, create && require scanner
 * Sync the latest version of github/linguist

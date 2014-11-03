@@ -8,7 +8,7 @@ python:
 
 install:
   - "pip install PyYAML"
-  - "pip install -e git+https://github.com/liluo/pygments.git@master#egg=Pygments-1.6"
+  - "pip install -e git+https://github.com/liluo/pygments-main.git@master#egg=Pygments"
   - "pip install pygments-github-lexers>=0.0.3"
   - "pip install charlockholmes"
   - "pip install mime>=0.0.3"
