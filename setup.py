@@ -10,7 +10,7 @@ setup(name='linguist',
       long_description='Language Savant',
       license='New BSD',
 
-      url='https://github.com/liluo/linguist',
+      url='https://github.com/douban/linguist',
       author='liluo',
       author_email='i@liluo.org',
 
