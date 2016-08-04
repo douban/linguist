@@ -12,7 +12,7 @@ setup(name='linguist',
       long_description='Language Savant',
       license='New BSD',
 
-      url='https://github.com/liluo/linguist',
+      url='https://github.com/douban/linguist',
       author='liluo',
       author_email='i@liluo.org',
 
@@ -23,7 +23,7 @@ setup(name='linguist',
       install_requires=['PyYAML',
                         'pygments-github-lexers>=0.0.3',
                         'charlockholmes',
-                        'mime>=0.0.3',
+                        'mime>=0.1.0',
                         'scanner>=0.0.4'],
       classifiers=[],
       scripts=['bin/pylinguist'])
