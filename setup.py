@@ -16,7 +16,7 @@ setup(name='linguist',
       author='liluo',
       author_email='i@liluo.org',
 
-      packages=find_packages(),
+      packages=find_packages(exclude=['tests', 'tests.*', 'samples', 'samples.*']),
       include_package_data=True,
       platforms='any',
       dependency_links = ['https://github.com/liluo/pygments-main/tarball/master'],
