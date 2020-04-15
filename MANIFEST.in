@@ -1,5 +1,9 @@
+include LICENSE
+include README.md
 include bin/pylinguist
 include linguist/libs/languages.yml
 include linguist/libs/popular.yml
 include linguist/libs/vendor.yml
 include linguist/libs/samples.json
+recursive-include tests *.py
+graft samples
